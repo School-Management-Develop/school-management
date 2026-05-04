@@ -20,7 +20,7 @@ class GroupController extends Controller
 
         $groups = $groupsQuery
             ->orderBy('group_name')
-            ->paginate(10)
+            ->paginate(20)
             ->appends($request->query());
 
         return view('backend.page.groups.index', compact('groups'));

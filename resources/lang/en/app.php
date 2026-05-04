@@ -208,7 +208,7 @@ return [
     'description' => 'Description',
     'Upload image' => 'Upload image',
     'Remove image' => 'Remove image',
-    'This phone number is already used by another student.' => 'This phone number is already used by another student.',
+    'This phone number is already used by' => 'This phone number is already used by',
     'Not yet call' => 'Not yet call',
     'No answer' => 'No answer',
     'Select Call Status' => 'Select Call Status',
@@ -289,4 +289,6 @@ return [
     'Submitted At' => 'Submitted At',
     'Borrow' => 'Borrow',
     'times' => 'times',
+    'This student is inactive and cannot borrow items.' => 'This student is inactive and cannot borrow items.',
+    'This student already has an active borrow' => 'This student already has an active borrow',
 ];

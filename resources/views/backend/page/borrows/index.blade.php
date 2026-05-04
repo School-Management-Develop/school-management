@@ -281,7 +281,7 @@
                             <label class="form-label small text-muted mb-1">{{ __('app.find_by') }}</label>
                             <select name="filter" class="form-select" onchange="this.form.submit()">
                                 {{-- <option value="">{{ __('app.find_by') }}</option> --}}
-                                <option value="group_name" {{ request('filter') == 'group_name' ? 'selected' : '' }}>
+                                <option value="group_name" {{ request('filter', 'group_name') == 'group_name' ? 'selected' : '' }}>
                                     {{ __('app.Search by group name...') }}
                                 </option>
                                 <option value="student_name" {{ request('filter') == 'student_name' ? 'selected' : '' }}>
@@ -323,7 +323,7 @@
                                 </select>
                             </div>
                         @endif
-                        @if (request('filter') == 'group_name')
+                        @if (request('filter', 'group_name') == 'group_name')
                             <div class="col-md-4">
                                 <label
                                     class="form-label small text-muted mb-1">{{ __('app.Search by group name...') }}</label>

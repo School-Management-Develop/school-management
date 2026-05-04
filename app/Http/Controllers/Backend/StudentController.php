@@ -46,7 +46,7 @@ class StudentController extends Controller
         }
 
         $students = $studentsQuery->orderByDesc('student_id')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         // Stats — all exclude the Teacher group

@@ -3,7 +3,7 @@
 
     $user = Auth::user();
     $role = strtolower($user->role ?? '');
-    $profilePhoto = !empty($user?->photo) ? Storage::url('' . $user->photo) : null;
+    $profilePhoto = !empty($user?->photo) ? Storage::url($user->photo) : null;
     $userInitial = strtoupper(substr($user->name ?? 'A', 0, 1));
 
     $pendingSubmissionCount = $pendingSubmissionCount ?? 0;
@@ -556,7 +556,7 @@
             </div>
         </div>
         <h6 class="text-center text-secondary opacity-50 mt-4" style="font-size: 0.75rem; letter-spacing: 1px;">
-            RELEASE 1.1
+            RELEASE 1.2
         </h6>
     </aside>
     {{-- </div> --}}

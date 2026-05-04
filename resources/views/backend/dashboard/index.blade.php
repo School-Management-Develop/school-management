@@ -275,7 +275,7 @@
                                         <div class="position-relative">
                                             <div class="mb-3" style="margin-bottom:0 !important;">
                                                 @if (!empty($user->photo))
-                                                    <img src="{{ Storage::url($user->photo) }}" alt="Profile"
+                                                    <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile"
                                                         class="rounded-circle border"
                                                         style="width:42px; height:42px; object-fit:cover;">
                                                 @else
@@ -308,7 +308,7 @@
                                         <li class="px-3 py-3">
                                             <div class="d-flex align-items-center gap-3">
                                                 @if ($profilePhoto)
-                                                    <img src="{{ $profilePhoto }}" alt="Profile"
+                                                    <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile"
                                                         class="rounded-circle border"
                                                         style="width:56px; height:56px; object-fit:cover;">
                                                 @else
@@ -464,7 +464,7 @@
                             </div>
                             <div class="rounded-3 d-flex align-items-center justify-content-center"
                                 style="width: 78px; height: 78px;   ">
-                                <img src="{{ $imageSocket?->image ? Storage::url($imageSocket->image) : '' }}"
+                                <img src="{{ asset('storage/'. $imageSocket?->image ?? '') }}"
                                     alt="socket" width="54" height="54"
                                     style="object-fit:cover; border-radius:10px; border: 2px solid #e5e7eb;">
                             </div>

@@ -25,7 +25,7 @@
                     <div class="col-12 col-md-4">
                         <div class="border rounded-4 p-3 text-center">
                             <img class="rounded-4 border" style="width:100%;max-width:260px;height:260px;object-fit:cover;"
-                                src="{{ $item->image ? asset('storage/' . $item->image) : '' }}"
+                                <img src="{{ asset('storage/' . $item->image) }}" alt="thumb"
                                 alt="item">
                         </div>
 

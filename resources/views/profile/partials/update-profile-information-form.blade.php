@@ -8,7 +8,7 @@
 
             <div class="d-flex align-items-center gap-3 flex-wrap">
                 @if (!empty($user->photo))
-                    <img src="{{ Storage::url(' ' . $user->photo) }}"
+                    <img src="{{ Storage::url($user->photo) }}"
                         alt="Profile"
                         class="rounded-circle border"
                         style="width:72px; height:72px; object-fit:cover;">

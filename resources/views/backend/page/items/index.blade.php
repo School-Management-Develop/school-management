@@ -127,7 +127,7 @@
 
                                     <td>
                                         <img class="rounded-3 border" style="width:44px;height:44px;object-fit:cover;"
-                                            src="{{ $it->image ? Storage::url($it->image) : '' }}" alt="thumb">
+                                            <img src="{{ asset('storage/' . $it->image) }}" alt="thumb">
                                     </td>
 
                                     <td>
@@ -326,7 +326,7 @@
                                 <div class="border border-2 border-secondary-subtle rounded-4 p-3">
                                     <div class="mb-3">
                                         <img class="rounded-3 border" style="width:80px;height:80px;object-fit:cover;"
-                                            src="{{ $it->image ? Storage::url($it->image) : '' }}" alt="thumb">
+                                            <img src="{{ asset('storage/' . $it->image) }}"  alt="thumb">
                                     </div>
 
                                     <input class="form-control" type="file" name="image" accept="image/*">

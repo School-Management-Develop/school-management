@@ -100,7 +100,7 @@
                     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                         <div class="d-flex align-items-center gap-3">
                             @if ($profilePhoto)
-                                <img src="{{ $profilePhoto }}" alt="Profile Photo"
+                                <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile Photo"
                                     class="rounded-circle border border-white shadow-sm"
                                     style="width:72px; height:72px; object-fit:cover;">
                             @else
@@ -138,7 +138,7 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-center align-items-center">
                                 @if ($profilePhoto)
-                                    <img src="{{ $profilePhoto }}" alt="Profile Photo"
+                                    <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile Photo"
                                         class="rounded-circle border border-white shadow-sm"
                                         style="width: 72px; height: 72px; object-fit: cover;">
                                 @else
@@ -228,7 +228,7 @@
 
                                 <div class="d-flex align-items-center gap-3 flex-wrap mb-3">
                                     @if ($user->photo)
-                                        <img src="{{ Storage::url($user->photo) }}" alt="Profile"
+                                        <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile"
                                             class="rounded-circle border"
                                             style="width:80px; height:80px; object-fit:cover;">
                                     @else

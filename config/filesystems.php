@@ -43,7 +43,7 @@ return [
             'root' => storage_path('app/public'),
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
-            'throw' => false,
+            'throw' => true,
             'report' => false,
         ],
         'custom' => [
@@ -82,7 +82,7 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
-        public_path('assets/uploads') => storage_path('../public/assets/uploads')
+        // public_path('assets/uploads') => storage_path('../public/assets/uploads')
         
     ],
 

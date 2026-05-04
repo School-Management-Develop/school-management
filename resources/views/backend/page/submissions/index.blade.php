@@ -221,7 +221,7 @@
 
                                 <td>
                                     @if (!empty($row->item?->image))
-                                        <img src="{{ Storage::url('' . $row->item->image) }}" width="60" height="60"
+                                        <img src="{{ asset('storage/' . $row->item->image) }}" width="60" height="60"
                                             style="object-fit:cover;border-radius:8px;">
                                     @else
                                         <span>No image</span>
@@ -392,3 +392,4 @@
         </div>
     @endforeach
 @endsection
+

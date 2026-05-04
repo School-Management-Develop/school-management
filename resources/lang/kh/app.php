@@ -207,7 +207,7 @@ return [
     'search_by_student_name' => 'ស្វែងរកតាមឈ្មោះសិស្ស',
     'item_name_en' => 'ឈ្មោះសម្ភារៈ (អង់គ្លេស)',
     'item_name_kh' => 'ឈ្មោះសម្ភារៈ (ខ្មែរ)',
-    'This phone number is already used by another student.' => 'លេខទូរស័ព្ទនេះត្រូវបានប្រើរួចហើយដោយសិស្សផ្សេងទៀត។',
+    'This phone number is already used by' => 'លេខទូរស័ព្ទនេះត្រូវបានប្រើដោយ',
     'Update Call Status' => 'ប្ដូរតំណាង',
     'Call Status' => 'ស្ថានភាព',
     'Select Call Status' => 'ជ្រើសរើសស្ថានភាពតំណាង',
@@ -289,4 +289,6 @@ return [
     'Submitted At' => 'ដាក់ស្នើនៅ',
     'Borrow' => 'ខ្ចី',
     'times' => 'ដង',
+    'This student is inactive and cannot borrow items.' => 'សិស្សនេះមិនសកម្មហើយមិនអាចខ្ចីសម្ភារៈបានទេ។',
+    'This student already has an active borrow' => 'សិស្សនេះមានការខ្ចីដែលកំពុងដំណើរការរួចហើយ',
 ];

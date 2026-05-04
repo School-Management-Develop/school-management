@@ -43,7 +43,7 @@
               <div class="mb-3">
                 <img class="rounded-3 border"
                      style="width:90px;height:90px;object-fit:cover;"
-                     src="{{ $item->image ? asset('storage/'.$item->image) : asset('assets/img/no-image.png') }}"
+                     src="{{ $item->image ? Storage::url($item->image) : asset('assets/img/no-image.png') }}"
                      alt="item">
               </div>
 

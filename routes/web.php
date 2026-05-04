@@ -26,6 +26,9 @@ Route::get('/register/check-group', function () {
     $exists = \App\Models\Group::where('group_id', request('group_id'))->exists();
     return response()->json(['exists' => $exists]);
 })->name('register.checkGroup');
+
+
+
 Route::get('/language/{locale}', function ($locale) {
     if (! in_array($locale, ['en', 'kh'], true)) {
         abort(400);

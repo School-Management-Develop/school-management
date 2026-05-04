@@ -24,7 +24,7 @@ class SubmissionController extends Controller
                     ->orWhere('phone_number', 'like', "%{$q}%");
             })
             ->latest()
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         $submissions->getCollection()->transform(function ($sub) {
@@ -69,9 +69,31 @@ class SubmissionController extends Controller
         $existingStudentByPhone = Student::where('phone_number', $request->phone_number)->first();
 
         if ($existingStudentByPhone) {
-            if (!$existingStudentByName || $existingStudentByPhone->student_id !== $existingStudentByName->student_id) {
+        if (!$existingStudentByName || $existingStudentByPhone->student_id !== $existingStudentByName->student_id) {
+            return back()
+                ->withErrors(['phone_number' => __('app.This phone number is already used by') . ' ' . $existingStudentByPhone->student_name])
+                ->withInput();
+        }
+    }
+        // Check if student exists by phone
+        $student = Student::where('phone_number', $request->phone_number)->first();
+
+        if ($student) {
+            // Block inactive students
+            if ($student->status == 0) {
                 return back()
-                    ->withErrors(['phone_number' => __('app.This phone number is already used by another student.')])
+                    ->withErrors(['student_name' => __('app.This student is inactive and cannot borrow items.')])
+                    ->withInput();
+            }
+
+            // Block students who already have an active borrow
+            $activeBorrow = Borrow::where('student_id', $student->student_id)
+                ->whereIn('status', ['BORROWED', 'OVERDUE'])
+                ->first();
+
+            if ($activeBorrow) {
+                return back()
+                    ->withErrors(['student_name' => __('app.This student already has an active borrow') . ' ' . e($activeBorrow->item->display_name ?? '-') ])
                     ->withInput();
             }
         }
@@ -357,4 +379,5 @@ class SubmissionController extends Controller
 
     return back()->with('success', __('app.Student group changed successfully. Now you can approve borrow.'));
 }
+
 }

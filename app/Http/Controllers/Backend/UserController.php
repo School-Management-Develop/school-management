@@ -19,7 +19,7 @@ class UserController extends Controller
                     ->orWhere('email', 'like', "%{$q}%");
             })
             ->orderByDesc('id')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         $statTotal = User::count();

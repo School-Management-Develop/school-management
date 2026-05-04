@@ -25,7 +25,7 @@ class TeacherController extends Controller
                 ->orWhere('phone_number', 'like', "%{$q}%")
             )
             ->orderBy('student_name')
-            ->paginate(10)
+            ->paginate(20)
             ->withQueryString();
 
         $stats = [
