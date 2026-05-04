@@ -86,14 +86,14 @@ class SubmissionController extends Controller
                     ->withInput();
             }
 
-            // Block students who already have an active borrow
-            $activeBorrow = Borrow::where('student_id', $student->student_id)
+            $activeBorrow = Borrow::where('student_id', $existingStudentByPhone->student_id)
+                ->where('item_id', $request->item_id)
                 ->whereIn('status', ['BORROWED', 'OVERDUE'])
                 ->first();
 
             if ($activeBorrow) {
                 return back()
-                    ->withErrors(['student_name' => __('app.This student already has an active borrow') . ' ' . e($activeBorrow->item->display_name ?? '-') ])
+                    ->withErrors(['student_name' => __('app.This student already borrowed this item') . e($activeBorrow->item->display_name ?? '-') ])
                     ->withInput();
             }
         }

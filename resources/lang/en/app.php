@@ -291,4 +291,5 @@ return [
     'times' => 'times',
     'This student is inactive and cannot borrow items.' => 'This student is inactive and cannot borrow items.',
     'This student already has an active borrow' => 'This student already has an active borrow',
+    'This student already borrowed this item' => 'This student already borrowed this item',
 ];
