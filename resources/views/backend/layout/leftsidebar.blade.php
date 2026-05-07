@@ -1,164 +1,164 @@
 @php
-    use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 
-    $user = Auth::user();
-    $role = strtolower($user->role ?? '');
-    $profilePhoto = !empty($user?->photo) ? Storage::url($user->photo) : null;
-    $userInitial = strtoupper(substr($user->name ?? 'A', 0, 1));
+$user = Auth::user();
+$role = strtolower($user->role ?? '');
+$profilePhoto = !empty($user?->photo) ? Storage::url($user->photo) : null;
+$userInitial = strtoupper(substr($user->name ?? 'A', 0, 1));
 
-    $pendingSubmissionCount = $pendingSubmissionCount ?? 0;
-    $overdueCount = $overdueCount ?? 0;
-    $lateReturnedCount = $lateReturnedCount ?? 0;
-    $notificationCount = $pendingSubmissionCount + $overdueCount;
+$pendingSubmissionCount = $pendingSubmissionCount ?? 0;
+$overdueCount = $overdueCount ?? 0;
+$lateReturnedCount = $lateReturnedCount ?? 0;
+$notificationCount = $pendingSubmissionCount + $overdueCount;
 
-    $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
+$canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
 @endphp
 
 <style>
-    .mobile-only {
-        font-size: 16px;
-    }
+.mobile-only {
+    font-size: 16px;
+}
 
-    .sidebar-menu {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-    }
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 
-    .sidebar-menu-item {
-        margin: 0;
-        padding: 0;
-    }
+.sidebar-menu-item {
+    margin: 0;
+    padding: 0;
+}
 
-    .sidebar-link {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-        padding: 12px 14px;
-        border-radius: 14px;
-        text-decoration: none;
-        color: #475569;
-        font-weight: 500;
-        transition: all 0.2s ease;
-        background: transparent;
-    }
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: transparent;
+}
 
-    .sidebar-link:hover {
-        background: #f8fafc;
-        color: #0f172a;
-        transform: translateX(2px);
-    }
+.sidebar-link:hover {
+    background: #f8fafc;
+    color: #0f172a;
+    transform: translateX(2px);
+}
 
-    .sidebar-link.active {
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: #fff !important;
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
-    }
+.sidebar-link.active {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+}
 
-    .sidebar-icon {
-        width: 22px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        flex-shrink: 0;
-    }
+.sidebar-icon {
+    width: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
 
-    .sidebar-label {
-        flex: 1;
-        min-width: 0;
-    }
+.sidebar-label {
+    flex: 1;
+    min-width: 0;
+}
 
-    .sidebar-badge {
-        min-width: 22px;
-        height: 22px;
-        padding: 0 8px;
-        border-radius: 999px;
-        background: #ef4444;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-    }
+.sidebar-badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
 
-    .dashboard-user-avatar,
-    .dashboard-user-initial {
-        width: 38px;
-        height: 38px;
-        object-fit: cover;
-    }
+.dashboard-user-avatar,
+.dashboard-user-initial {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+}
 
-    .dashboard-dropdown-avatar,
-    .dashboard-dropdown-initial {
-        width: 52px;
-        height: 52px;
-        object-fit: cover;
-    }
+.dashboard-dropdown-avatar,
+.dashboard-dropdown-initial {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+}
 
-    .dashboard-user-initial,
-    .dashboard-dropdown-initial {
-        background: #e2e8f0;
-        color: #0f172a;
-    }
+.dashboard-user-initial,
+.dashboard-dropdown-initial {
+    background: #e2e8f0;
+    color: #0f172a;
+}
 
-    .dashboard-profile-btn {
-        background: #fff;
-    }
+.dashboard-profile-btn {
+    background: #fff;
+}
 
-    .dropdown_menu {
-        list-style: none;
-        margin: 0;
-        padding: 10px;
-        min-width: 260px;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
-        position: absolute;
-        right: 0;
-        top: calc(100% + 10px);
-        z-index: 1055;
-        display: none;
-    }
+.dropdown_menu {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    min-width: 260px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    z-index: 1055;
+    display: none;
+}
 
-    .dropdown_menu.show {
-        display: block;
-    }
+.dropdown_menu.show {
+    display: block;
+}
 
-    .dropdown_menu li+li {
-        margin-top: 8px;
-    }
+.dropdown_menu li+li {
+    margin-top: 8px;
+}
 
-    .notification-link {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 12px;
-        text-decoration: none;
-        color: #334155;
-        background: #f8fafc;
-        font-weight: 500;
-    }
+.notification-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #334155;
+    background: #f8fafc;
+    font-weight: 500;
+}
 
-    .notification-link:hover {
-        background: #eff6ff;
-        color: #0f172a;
-    }
+.notification-link:hover {
+    background: #eff6ff;
+    color: #0f172a;
+}
 
-    .sidebar-language-switch .btn {
-        border-radius: 10px;
-    }
+.sidebar-language-switch .btn {
+    border-radius: 10px;
+}
 
-    .mobile-sidebar-header {
-        line-height: 1.1;
-    }
+.mobile-sidebar-header {
+    line-height: 1.1;
+}
 </style>
 
 <div class="d-lg-none mobile-topbar bg-white border-bottom px-3 py-2 d-flex align-items-center justify-content-between">
@@ -177,9 +177,9 @@
                     <i class="bi bi-bell"></i>
 
                     @if ($notificationCount > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ $notificationCount }}
-                        </span>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $notificationCount }}
+                    </span>
                     @endif
                 </button>
 
@@ -191,7 +191,7 @@
                             <span class="flex-grow-1">{{ __('app.submissions') }}</span>
 
                             @if ($pendingSubmissionCount > 0)
-                                <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
+                            <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
                             @endif
                         </a>
                     </li>
@@ -203,7 +203,7 @@
                             <span class="flex-grow-1">{{ __('app.overdue_borrow') }}</span>
 
                             @if ($overdueCount > 0)
-                                <span class="sidebar-badge">{{ $overdueCount }}</span>
+                            <span class="sidebar-badge">{{ $overdueCount }}</span>
                             @endif
                         </a>
                     </li>
@@ -217,13 +217,13 @@
 
                     <div class="position-relative flex-shrink-0">
                         @if ($profilePhoto)
-                            <img src="{{ $profilePhoto }}" alt="Profile"
-                                class="dashboard-user-avatar rounded-circle border">
+                        <img src="{{ $profilePhoto }}" alt="Profile"
+                            class="dashboard-user-avatar rounded-circle border">
                         @else
-                            <div
-                                class="dashboard-user-initial rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase border">
-                                {{ $userInitial }}
-                            </div>
+                        <div
+                            class="dashboard-user-initial rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase border">
+                            {{ $userInitial }}
+                        </div>
                         @endif
 
                         <span
@@ -248,13 +248,13 @@
                     <li class="px-3 py-3">
                         <div class="d-flex align-items-center gap-3">
                             @if ($profilePhoto)
-                                <img src="{{ $profilePhoto }}" alt="Profile"
-                                    class="dashboard-dropdown-avatar rounded-circle border">
+                            <img src="{{ $profilePhoto }}" alt="Profile"
+                                class="dashboard-dropdown-avatar rounded-circle border">
                             @else
-                                <div
-                                    class="dashboard-dropdown-initial rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase border">
-                                    {{ $userInitial }}
-                                </div>
+                            <div
+                                class="dashboard-dropdown-initial rounded-circle d-flex align-items-center justify-content-center fw-bold text-uppercase border">
+                                {{ $userInitial }}
+                            </div>
                             @endif
 
                             <div class="min-w-0">
@@ -346,7 +346,7 @@
                                 <span class="sidebar-label">{{ __('app.teachers') }}</span>
                             </a>
                         </li>
-                        
+
 
                         <li class="sidebar-menu-item">
                             <a href="{{ route('groups.index') }}"
@@ -387,19 +387,19 @@
                                 <span class="sidebar-label">{{ __('app.submissions') }}</span>
 
                                 @if ($pendingSubmissionCount > 0)
-                                    <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
+                                <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
                                 @endif
                             </a>
                         </li>
 
                         @if ($canManageUsers)
-                            <li class="sidebar-menu-item">
-                                <a href="{{ route('users.index') }}"
-                                    class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                                    <span class="sidebar-icon"><i class="bi bi-person-gear"></i></span>
-                                    <span class="sidebar-label">{{ __('app.users') }}</span>
-                                </a>
-                            </li>
+                        <li class="sidebar-menu-item">
+                            <a href="{{ route('users.index') }}"
+                                class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                <span class="sidebar-icon"><i class="bi bi-person-gear"></i></span>
+                                <span class="sidebar-label">{{ __('app.users') }}</span>
+                            </a>
+                        </li>
                         @endif
 
                         <li class="sidebar-menu-item">
@@ -409,7 +409,7 @@
                                 <span class="sidebar-label">{{ __('app.returned_late') }}</span>
 
                                 @if ($lateReturnedCount > 0)
-                                    <span class="sidebar-badge">{{ $lateReturnedCount }}</span>
+                                <span class="sidebar-badge">{{ $lateReturnedCount }}</span>
                                 @endif
                             </a>
                         </li>
@@ -421,7 +421,7 @@
                                 <span class="sidebar-label">{{ __('app.overdue_borrow') }}</span>
 
                                 @if ($overdueCount > 0)
-                                    <span class="sidebar-badge">{{ $overdueCount }}</span>
+                                <span class="sidebar-badge">{{ $overdueCount }}</span>
                                 @endif
                             </a>
                         </li>
@@ -458,7 +458,7 @@
                         <span class="sidebar-label">{{ __('app.students') }}</span>
                     </a>
                 </li>
-                 <li class="sidebar-menu-item">
+                <li class="sidebar-menu-item">
                     <a href="{{ route('teachers.index') }}"
                         class="sidebar-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}">
                         <span class="sidebar-icon"><i class="bi bi-people-fill"></i></span>
@@ -505,19 +505,19 @@
                         <span class="sidebar-label">{{ __('app.submissions') }}</span>
 
                         @if ($pendingSubmissionCount > 0)
-                            <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
+                        <span class="sidebar-badge">{{ $pendingSubmissionCount }}</span>
                         @endif
                     </a>
                 </li>
 
                 @if ($canManageUsers)
-                    <li class="sidebar-menu-item">
-                        <a href="{{ route('users.index') }}"
-                            class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                            <span class="sidebar-icon"><i class="bi bi-person-gear"></i></span>
-                            <span class="sidebar-label">{{ __('app.users') }}</span>
-                        </a>
-                    </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('users.index') }}"
+                        class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <span class="sidebar-icon"><i class="bi bi-person-gear"></i></span>
+                        <span class="sidebar-label">{{ __('app.users') }}</span>
+                    </a>
+                </li>
                 @endif
 
                 <li class="sidebar-menu-item">
@@ -527,7 +527,7 @@
                         <span class="sidebar-label">{{ __('app.returned_late') }}</span>
 
                         @if ($lateReturnedCount > 0)
-                            <span class="sidebar-badge">{{ $lateReturnedCount }}</span>
+                        <span class="sidebar-badge">{{ $lateReturnedCount }}</span>
                         @endif
                     </a>
                 </li>
@@ -539,7 +539,7 @@
                         <span class="sidebar-label">{{ __('app.overdue_borrow') }}</span>
 
                         @if ($overdueCount > 0)
-                            <span class="sidebar-badge">{{ $overdueCount }}</span>
+                        <span class="sidebar-badge">{{ $overdueCount }}</span>
                         @endif
                     </a>
                 </li>
@@ -556,11 +556,11 @@
             </div>
         </div>
         <h6 class="text-center text-secondary opacity-50 mt-4" style="font-size: 0.75rem; letter-spacing: 1px;">
-            RELEASE 1.2
+            RELEASE 1.2.1
         </h6>
     </aside>
     {{-- </div> --}}
-{{-- 
+    {{-- 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const notificationBtn = document.getElementById('notification');
