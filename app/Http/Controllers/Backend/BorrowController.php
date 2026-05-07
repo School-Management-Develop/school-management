@@ -71,11 +71,11 @@ class BorrowController extends Controller
        
         $stats = [
             'total_records'   => Borrow::count(),
-            'active_records'  => Borrow::where('status', 'BORROWED')->count(),
+            'active_records'  => Borrow::whereIn('status', ['BORROWED', 'OVERDUE'])->count(),
             'overdue_records' => Borrow::where('status', 'OVERDUE')->count(),
             'returned_records'=> Borrow::where('status', 'RETURNED')->count(),
             'total_qty'       => Borrow::sum('qty'),
-            'borrowed_qty'    => Borrow::where('status', 'BORROWED')->sum('qty'),
+            'borrowed_qty'    => Borrow::whereIn('status', ['BORROWED', 'OVERDUE'])->sum('qty'),
             'returned_qty'    => Borrow::where('status', 'RETURNED')->sum('qty'),
         ];
 

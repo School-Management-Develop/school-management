@@ -24,7 +24,7 @@ class ItemController extends Controller
 
         $items = $itemsQuery
             ->withSum(['borrows as borrowed_qty' => function ($q) {
-                $q->where('status', 'BORROWED');
+                $q->whereIn('status', ['BORROWED', 'OVERDUE']);
             }], 'qty')
             ->orderByDesc('Itemid')
             ->paginate(10)
@@ -125,7 +125,7 @@ class ItemController extends Controller
         $item = Item::where('Itemid', $itemid)->firstOrFail();
 
         $borrowed = Borrow::where('item_id', $item->Itemid)
-            ->where('status', 'BORROWED')
+            ->whereIn('status', ['BORROWED', 'OVERDUE'])
             ->sum('qty');
 
         $available = $item->qty ?? 0;

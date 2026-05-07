@@ -43,7 +43,7 @@ class DashboardController extends Controller
         $imageSocket = $socketItem; // null safe — blade uses ?->image
 
         $availableItems = Item::sum('qty');
-        $borrowedItems  = Borrow::where('status', 'BORROWED')->sum('qty');
+        $borrowedItems  = Borrow::whereIn('status', ['BORROWED', 'OVERDUE'])->sum('qty');
 
         $pendingSubmissions = StudentSubmission::where('is_borrow_approved', false)->count();
 
