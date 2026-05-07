@@ -39,7 +39,7 @@ class ProfileController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('profile', 'public');
+            $path = $request->file('photo')->storePublicly('profile');
             $user->photo = $path;
             $user->save();
         }
@@ -57,9 +57,9 @@ class ProfileController extends Controller
 
         if ($request->hasFile('photo')) {
             if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
+                Storage::delete($user->photo);
             }
-            $path = $request->file('photo')->store('profile', 'public');
+            $path = $request->file('photo')->storePublicly('profile');
             $user->photo = $path;
             $user->save();
         }

@@ -40,31 +40,63 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'name_kh' => 'nullable|string|max:255',
-            'qty' => 'required|integer|min:0',
-            'status' => 'required|in:0,1',
+            'name'        => 'required|string|max:255',
+            'name_kh'     => 'nullable|string|max:255',
+            'qty'         => 'required|integer|min:0',
+            'status'      => 'required|in:0,1',
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2024',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $path = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('items', 'public');
+            $path = $request->file('image')->storePublicly('items');
         }
 
         Item::create([
-            'name' => $request->name,
-            'name_kh' => $request->name_kh,
-            'qty' => $request->qty,
-            'status' => $request->status,
+            'name'        => $request->name,
+            'name_kh'     => $request->name_kh,
+            'qty'         => $request->qty,
+            'status'      => $request->status,
             'description' => $request->description,
-            'image' => $path,
-            'available' => 0,
-            'borrow' => 0,
+            'image'       => $path,
+            'available'   => 0,
+            'borrow'      => 0,
         ]);
 
         return back()->with('success', __('app.Item added successfully!'));
+    }
+
+    public function update(Request $request, $itemid)
+    {
+        $item = Item::where('Itemid', $itemid)->firstOrFail();
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'name_kh'     => 'nullable|string|max:255',
+            'qty'         => 'required|integer|min:0',
+            'status'      => 'required|in:0,1',
+            'description' => 'nullable|string|max:1000',
+            'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        ]);
+
+        $path = $item->image;
+        if ($request->hasFile('image')) {
+            if ($item->image) {
+                Storage::delete($item->image);
+            }
+            $path = $request->file('image')->storePublicly('items');
+        }
+
+        $item->image       = $path;
+        $item->name        = $request->name;
+        $item->name_kh     = $request->name_kh;
+        $item->qty         = $request->qty;
+        $item->status      = $request->status;
+        $item->description = $request->description;
+        $item->save();
+
+        return back()->with('success', __('app.Item updated successfully!'));
     }
 
     public function destroy(Request $request, $itemid)
@@ -80,59 +112,12 @@ class ItemController extends Controller
         $item = Item::where('Itemid', $itemid)->firstOrFail();
 
         if ($item->image) {
-            Storage::disk('public')->delete($item->image);
-            Storage::disk('public')->delete('items/thumbnails/'.basename($item->image));
+            Storage::delete($item->image);
         }
 
         $item->delete();
 
         return redirect()->route('items.index')->with('success', __('app.Item deleted!'));
-    }
-
-    // public function edit($itemid)
-    // {
-    //     $item = Item::where('Itemid', $itemid)->firstOrFail();
-
-    //     return view('backend.page.items.edit', compact('item'));
-    // }
-
-    public function update(Request $request, $itemid)
-    {
-        // 1. Find the item
-        $item = Item::where('Itemid', $itemid)->firstOrFail();
-
-        // 2. Validate
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'name_kh' => 'nullable|string|max:255',
-            'qty' => 'required|integer|min:0',
-            'status' => 'required|in:0,1',
-            'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-        ]);
-
-        // 3. Handle Image Upload
-        $path = $item->image;
-        if ($request->hasFile('image')) {
-            if ($item->image) {
-                Storage::disk('public')->delete($item->image);
-            }
-            $path = $request->file('image')->store('items', 'public');
-        }
-        $item->image = $path;
-
-        // 4. Update other fields
-        $item->name = $request->name;
-        $item->name_kh = $request->name_kh;
-        $item->qty = $request->qty;
-        $item->status = $request->status;
-        $item->description = $request->description;
-
-        // 5. Save the changes
-        $item->save();
-
-        // 6. Trigger that SweetAlert we set up earlier!
-        return back()->with('success', __('app.Item updated successfully!'));
     }
 
     public function show($itemid)
