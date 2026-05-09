@@ -292,4 +292,11 @@ return [
     'This student is inactive and cannot borrow items.' => 'សិស្សនេះមិនសកម្មហើយមិនអាចខ្ចីសម្ភារៈបានទេ។',
     'This student already has an active borrow' => 'សិស្សនេះមានការខ្ចីដែលកំពុងដំណើរការរួចហើយ',
     'This student already borrowed this item' => 'សិស្សនេះបានខ្ចីសម្ភារៈនេះរួចហើយ',
+    'All Users' => 'អ្នកប្រើទាំងអស់',
+    'All Actions' => 'សកម្មភាពទាំងអស់',
+'All Items' => 'សម្ភារៈទាំងអស់',
+'Search...' => 'ស្វែងរក...',
+'Call history' => 'ប្រវត្តិការហៅ',
+'overdue' => 'ហួសកំណត់',
+'days' => 'ថ្ងៃ',
 ];

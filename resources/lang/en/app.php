@@ -292,4 +292,11 @@ return [
     'This student is inactive and cannot borrow items.' => 'This student is inactive and cannot borrow items.',
     'This student already has an active borrow' => 'This student already has an active borrow',
     'This student already borrowed this item' => 'This student already borrowed this item',
+    'All Users' => 'All Users',
+    'All Actions' => 'All Actions',
+    'All Items' => 'All Items',
+    'Search...' => 'Search...',
+    'Call history' => 'Call history',
+'overdue' => 'overdue',
+'days' => 'days',
 ];
