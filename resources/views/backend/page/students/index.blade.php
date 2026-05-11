@@ -12,7 +12,8 @@
         <div id="alert-container" class="position-fixed top-0 end-0 p-3" style="z-index: 9999; max-width: 400px;">
 
             @if (session('success'))
-                <div class="alert custom-toast alert-success border-0 border-start border-5 border-success shadow-sm rounded-4 fade show bg-white mb-3" role="alert">
+                <div class="alert custom-toast alert-success border-0 border-start border-5 border-success shadow-sm rounded-4 fade show bg-white mb-3"
+                    role="alert">
                     <div class="d-flex align-items-center p-2">
                         <div class="me-3 fs-4 text-success"><i class="bi bi-check-circle-fill"></i></div>
                         <div>
@@ -27,7 +28,8 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $e)
-                    <div class="alert custom-toast alert-danger border-0 border-start border-5 border-danger shadow-sm rounded-4 fade show bg-white mb-2" role="alert">
+                    <div class="alert custom-toast alert-danger border-0 border-start border-5 border-danger shadow-sm rounded-4 fade show bg-white mb-2"
+                        role="alert">
                         <div class="d-flex align-items-center p-2">
                             <div class="me-3 fs-4 text-danger"><strong>!</strong></div>
                             <div>
@@ -113,10 +115,9 @@
                                     <div class="position-relative d-inline-block" style="overflow: visible;">
                                         <button type="button"
                                             class="btn btn-link text-dark text-decoration-none p-0 fw-semibold small"
-                                            id="groupFilterBtn"
-                                            onclick="toggleGroupDropdown(event)">
+                                            id="groupFilterBtn" onclick="toggleGroupDropdown(event)">
                                             {{ __('app.Group') }}
-                                            @if(request('group_id'))
+                                            @if (request('group_id'))
                                                 <span class="text-primary">
                                                     ({{ $groups->firstWhere('group_id', request('group_id'))?->group_name }})
                                                 </span>
@@ -127,12 +128,9 @@
                                         <div class="position-absolute bg-white border rounded-3 shadow-lg p-2 d-none"
                                             id="groupFilterDropdown"
                                             style="z-index: 1055; min-width: 220px; left: 0; top: calc(100% + 6px);">
-                                            <input type="text"
-                                                class="form-control form-control-sm rounded-3 mb-2"
-                                                id="groupSearchInput"
-                                                placeholder="{{ __('app.Search group...') }}"
-                                                autocomplete="off"
-                                                onkeyup="filterGroupList()">
+                                            <input type="text" class="form-control form-control-sm rounded-3 mb-2"
+                                                id="groupSearchInput" placeholder="{{ __('app.Search group...') }}"
+                                                autocomplete="off" onkeyup="filterGroupList()">
 
                                             <div style="max-height: 200px; overflow-y: auto;" id="groupListContainer">
                                                 <a href="{{ url()->current() . '?' . http_build_query(array_diff_key(request()->query(), ['group_id' => ''])) }}"
@@ -154,7 +152,40 @@
                                 </th>
 
                                 <th>{{ __('app.Status') }}</th>
-                                <th>{{ __('app.Borrow') }}</th> 
+                                <th>
+                                    <div class="position-relative d-inline-block">
+                                        <button type="button"
+                                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold small"
+                                            onclick="toggleBorrowDropdown(event)">
+                                            {{ __('app.Borrow') }}
+                                            @if (request('borrow_sort'))
+                                                <span class="text-primary">
+                                                    ({{ request('borrow_sort') === 'asc' ? __('app.Ascending') : __('app.Descending') }})
+                                                </span>
+                                            @endif
+                                            <i class="bi bi-chevron-down ms-1" style="font-size: 10px;"></i>
+                                        </button>
+
+                                        <div class="position-absolute bg-white border rounded-3 shadow-lg d-none"
+                                            id="borrowSortDropdown"
+                                            style="z-index: 1050; width: 180px; left: 0; top: 100%; margin-top: 6px;">
+                                            <div style="max-height: 220px; overflow-y: auto;" class="py-1">
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_diff_key(request()->query(), ['borrow_sort' => '', 'page' => ''])) }}"
+                                                    class="d-block text-decoration-none px-3 py-2 small {{ !request('borrow_sort') ? 'fw-bold text-primary bg-light' : 'text-dark' }}">
+                                                    {{ __('app.Default') }}
+                                                </a>
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge(request()->query(), ['borrow_sort' => 'asc', 'page' => 1])) }}"
+                                                    class="d-block text-decoration-none px-3 py-2 small {{ request('borrow_sort') === 'asc' ? 'fw-bold text-primary bg-light' : 'text-dark' }}">
+                                                    <i class="bi bi-sort-up me-1"></i>{{ __('app.Ascending') }}
+                                                </a>
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge(request()->query(), ['borrow_sort' => 'desc', 'page' => 1])) }}"
+                                                    class="d-block text-decoration-none px-3 py-2 small {{ request('borrow_sort') === 'desc' ? 'fw-bold text-primary bg-light' : 'text-dark' }}">
+                                                    <i class="bi bi-sort-down me-1"></i>{{ __('app.Descending') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
                                 <th class="text-center" style="width:180px;">{{ __('app.action') }}</th>
                             </tr>
                         </thead>
@@ -186,15 +217,12 @@
                                         </span>
                                     </td>
                                     <td class="text-end">
-                                        <button type="button" class="btn btn-light btn-sm me-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#viewStudentModal{{ $s->student_id }}"
-                                            title="View">
+                                        <button type="button" class="btn btn-light btn-sm me-1" data-bs-toggle="modal"
+                                            data-bs-target="#viewStudentModal{{ $s->student_id }}" title="View">
                                             <i class="bi bi-eye"></i>
                                         </button>
 
-                                        <button type="button" class="btn btn-light btn-sm me-1"
-                                            data-bs-toggle="modal"
+                                        <button type="button" class="btn btn-light btn-sm me-1" data-bs-toggle="modal"
                                             data-bs-target="#editStudentModal{{ $s->student_id }}">
                                             <i class="bi bi-pencil"></i>
                                         </button>
@@ -260,8 +288,10 @@
                             </label>
                             <select name="gender" class="form-select" required>
                                 <option value="">-- {{ __('app.select_gender') }} --</option>
-                                <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>{{ __('app.male') }}</option>
-                                <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>{{ __('app.female') }}</option>
+                                <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>
+                                    {{ __('app.male') }}</option>
+                                <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>
+                                    {{ __('app.female') }}</option>
                             </select>
                             @error('gender')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -299,8 +329,10 @@
                                 {{ __('app.Status') }} <span class="text-danger">*</span>
                             </label>
                             <select name="status" class="form-select rounded-3 py-2" required>
-                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>{{ __('app.active') }}</option>
-                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>{{ __('app.inactive') }}</option>
+                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>
+                                    {{ __('app.active') }}</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>
+                                    {{ __('app.inactive') }}</option>
                             </select>
                             @error('status')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -350,8 +382,10 @@
                                     {{ __('app.Gender') }} <span class="text-danger">*</span>
                                 </label>
                                 <select name="gender" class="form-select" required>
-                                    <option value="Male" {{ old('gender', $s->gender) == 'Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ old('gender', $s->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Male" {{ old('gender', $s->gender) == 'Male' ? 'selected' : '' }}>
+                                        Male</option>
+                                    <option value="Female" {{ old('gender', $s->gender) == 'Female' ? 'selected' : '' }}>
+                                        Female</option>
                                 </select>
                             </div>
 
@@ -384,8 +418,10 @@
                                     {{ __('app.Status') }} <span class="text-danger">*</span>
                                 </label>
                                 <select name="status" class="form-select rounded-3 py-2" required>
-                                    <option value="1" {{ old('status', $s->status) == 1 ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old('status', $s->status) == 0 ? 'selected' : '' }}>Inactive</option>
+                                    <option value="1" {{ old('status', $s->status) == 1 ? 'selected' : '' }}>Active
+                                    </option>
+                                    <option value="0" {{ old('status', $s->status) == 0 ? 'selected' : '' }}>
+                                        Inactive</option>
                                 </select>
                             </div>
 
@@ -393,7 +429,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
+                        <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
                         <button class="btn btn-dark">
                             <i class="bi bi-check2-circle me-1"></i> {{ __('app.Update') }}
                         </button>
@@ -473,7 +510,8 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.close') }}</button>
+                        <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">{{ __('app.close') }}</button>
                     </div>
 
                 </div>
@@ -484,7 +522,7 @@
     {{-- Auto-open Add modal on validation error --}}
     @if ($errors->any())
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 new bootstrap.Modal(document.getElementById('addStudentModal')).show();
             });
         </script>
@@ -492,31 +530,32 @@
 
     <script>
         // ── Phone validation (Add form) ──────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            const addForm    = document.getElementById('addStudentForm');
+        document.addEventListener('DOMContentLoaded', function() {
+            const addForm = document.getElementById('addStudentForm');
             const phoneInput = document.getElementById('add_phone_number');
             const phoneError = document.getElementById('add_phone_error');
 
             if (!addForm || !phoneInput || !phoneError) return;
 
-            phoneInput.addEventListener('input', function () {
+            phoneInput.addEventListener('input', function() {
                 this.value = this.value.replace(/\D/g, '').slice(0, 10);
                 phoneError.textContent = '';
                 this.setCustomValidity('');
             });
 
-            phoneInput.addEventListener('keypress', function (e) {
+            phoneInput.addEventListener('keypress', function(e) {
                 if (!/[0-9]/.test(e.key)) e.preventDefault();
             });
 
-            addForm.addEventListener('submit', function (e) {
+            addForm.addEventListener('submit', function(e) {
                 const value = phoneInput.value.trim();
                 phoneError.textContent = '';
                 phoneInput.setCustomValidity('');
 
                 if (value !== '' && !/^0[0-9]{8,9}$/.test(value)) {
                     e.preventDefault();
-                    phoneError.textContent = '{{ __('app.Phone number must be 9 or 10 digits and start with 0.') }}';
+                    phoneError.textContent =
+                        '{{ __('app.Phone number must be 9 or 10 digits and start with 0.') }}';
                     phoneInput.setCustomValidity('Invalid phone number');
                     phoneInput.reportValidity();
                 }
@@ -541,10 +580,23 @@
             });
         }
 
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('groupFilterDropdown');
-            const btn      = document.getElementById('groupFilterBtn');
+            const btn = document.getElementById('groupFilterBtn');
             if (dropdown && !dropdown.contains(e.target) && e.target !== btn) {
+                dropdown.classList.add('d-none');
+            }
+        });
+
+        function toggleBorrowDropdown(e) {
+            e.stopPropagation();
+            var dropdown = document.getElementById('borrowSortDropdown');
+            dropdown.classList.toggle('d-none');
+        }
+
+        document.addEventListener('click', function(e) {
+            var dropdown = document.getElementById('borrowSortDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
                 dropdown.classList.add('d-none');
             }
         });

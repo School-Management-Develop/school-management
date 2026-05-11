@@ -24,6 +24,13 @@ class StudentController extends Controller
         if ($request->filled('group_id')) {
         $studentsQuery->where('group_id', $request->group_id);
 }
+
+        // Borrow count sort
+        if ($request->filled('borrow_sort')) {
+            $studentsQuery->orderBy('borrows_count', $request->borrow_sort);
+        } else {
+            $studentsQuery->orderByDesc('student_id');
+        }
         // Multi-column search
         if ($request->filled('q')) {
             $q = trim($request->q);

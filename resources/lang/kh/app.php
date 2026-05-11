@@ -299,4 +299,7 @@ return [
 'Call history' => 'ប្រវត្តិការហៅ',
 'overdue' => 'ហួសកំណត់',
 'days' => 'ថ្ងៃ',
+'Default' => 'លំនាំដើម',
+'Ascending' => 'តិចទៅច្រើន',
+'Descending' => 'ច្រើនទៅតិច',
 ];

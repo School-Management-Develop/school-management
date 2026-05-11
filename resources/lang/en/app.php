@@ -299,4 +299,7 @@ return [
     'Call history' => 'Call history',
 'overdue' => 'overdue',
 'days' => 'days',
+'Default' => 'Default',
+'Ascending' => 'Ascending',
+'Descending' => 'Descending',
 ];
