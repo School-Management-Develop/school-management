@@ -519,7 +519,6 @@ $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
                     </a>
                 </li>
                 @endif
-
                 <li class="sidebar-menu-item">
                     <a href="{{ route('borrows.late_returns') }}"
                         class="sidebar-link {{ request()->routeIs('borrows.late_returns') ? 'active' : '' }}">
@@ -556,7 +555,7 @@ $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
             </div>
         </div>
         <h6 class="text-center text-secondary opacity-50 mt-4" style="font-size: 0.75rem; letter-spacing: 1px;">
-            RELEASE 1.2.1
+            RELEASE 1.3
         </h6>
     </aside>
     {{-- </div> --}}

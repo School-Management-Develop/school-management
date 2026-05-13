@@ -211,6 +211,9 @@ Route::middleware(['auth', 'role:admin,staff'])
 
         Route::post('/submissions/cancel-all', [SubmissionController::class, 'cancelAll'])
             ->name('submissions.cancelAll');
+
+        Route::patch('users/{user}/telegram', [UserController::class, 'updateTelegram'])->name('users.telegram.update');
+        Route::delete('users/{user}/telegram', [UserController::class, 'removeTelegram'])->name('users.telegram.remove');
     });
 
 /*

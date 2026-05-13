@@ -8,6 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel=icon href="{{ asset('assets/img/image.png') }}" type="image/png">
 
     <style>
         :root {
@@ -54,10 +55,12 @@
             -webkit-backdrop-filter: blur(14px);
             box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
         }
+
         .backdrop-blur {
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
         }
+
         .auth-body {
             padding: 42px 42px 0 42px;
         }
@@ -183,7 +186,7 @@
             height: 58px;
             border: none;
             border-radius: 17px;
-           /* background: linear-gradient(135deg, #065f46, #10b981); */
+            /* background: linear-gradient(135deg, #065f46, #10b981); */
             color: #fff;
             font-weight: 700;
             font-size: 1rem;
@@ -265,8 +268,8 @@
         .btn-login:hover {
             /* background: #4338ca; */
             transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
-    filter: brightness(1.05);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35);
+            filter: brightness(1.05);
         }
 
         /* Forgot link */
@@ -452,7 +455,6 @@
             /* transform: translateY(0); */
             transition-delay: 0.2s;
         }
-        
     </style>
 </head>
 
@@ -506,23 +508,23 @@
                         </div>
                     </div>
                     <div class="login-box">
-            
+
                         <!-- Login Button -->
                         <button type="submit" class="btn-login">
                             <i class="bi bi-box-arrow-in-right"></i>
                             Login to Dashboard
                         </button>
-            
+
                         <!-- Forgot Password -->
                         <p class="forgot">
                             <a href="#" id="openAdmin">Forgot password? <span class="contact">Contact
                                     Admin</span></a>
                         </p>
-            
+
                     </div>
 
                 </form>
-                
+
                 {{-- <div class="bottom-note">
                     Protected admin access with secure session handling
                 </div> --}}
@@ -534,13 +536,13 @@
                         Remember me
                     </label>
                 </div> --}}
-        
-        
+
+
                 <!-- Admin Popup -->
             </div>
         </div>
     </div>
-    
+
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -549,14 +551,15 @@
                 Please message one of our <span>admins on Telegram</span>
                 for password recovery
             </p>
+            {{-- Replace the hardcoded <ul class="admin-list"> --}}
             <ul class="admin-list">
-                <li><a href="https://t.me/Khoeurn_Thearith" target="_blank"><i
-                            class="bi bi-telegram"></i>Khoeurn Thearith</a>
-                </li>
-                <li><a href="https://t.me/PhonSakada" target="_blank"><i
-                            class="bi bi-telegram"></i>Phon Sakada</a></li>
-                <li><a href="https://t.me/ChulChivorn" target="_blank"><i
-                            class="bi bi-telegram"></i>Chul Chivorn</a></li>
+                @foreach (\App\Models\User::whereNotNull('telegram_username')->where('status', 1)->get() as $u)
+                    <li>
+                        <a href="https://t.me/{{ $u->telegram_username }}" target="_blank">
+                            <i class="bi bi-telegram"></i>{{ $u->name }}
+                        </a>
+                    </li>
+                @endforeach
             </ul>
         </div>
     </div>
@@ -569,8 +572,8 @@
             password.setAttribute('type', type);
 
             this.innerHTML = type === 'password' ?
-                '<i class="bi bi-eye"></i>' :
-                '<i class="bi bi-eye-slash"></i>';
+                '<i class="bi bi-eye-slash"></i>' :
+                '<i class="bi bi-eye"></i>';
         });
 
         const openBtn = document.getElementById("openAdmin");
@@ -582,7 +585,7 @@
             e.preventDefault();
             modal.classList.add("show");
             document.body.classList.add("backdrop-blur"); // Optional: prevent background scroll when modal is open
-            
+
         };
 
         // Close (X)

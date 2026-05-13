@@ -85,4 +85,23 @@ class UserController extends Controller
 
         return back()->with('success', 'app.User deleted successfully.');
     }
+    public function updateTelegram(Request $request, User $user)
+    {
+        $request->validate([
+            'telegram_username' => 'required|string|max:255',
+        ]);
+
+        $user->update([
+            'telegram_username' => ltrim($request->telegram_username, '@'),
+        ]);
+
+        return back()->with('success', __('app.Telegram updated successfully.'));
+    }
+
+    public function removeTelegram(User $user)
+    {
+        $user->update(['telegram_username' => null]);
+
+        return back()->with('success', __('app.Telegram removed successfully.'));
+    }
 }
