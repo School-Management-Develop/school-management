@@ -229,7 +229,8 @@
                 @if ($canManageUsers)
                     <button class="btn btn-success d-flex align-items-center gap-2" data-bs-toggle="modal"
                         data-bs-target="#restoreBorrowModal">
-                        <span class="fs-5"><i class="fa-sharp fa-thin fa-trash-undo"></i></span> {{ __('app.restore_item') }}
+                        <span class="fs-5"><i class="fa-sharp fa-thin fa-trash-undo"></i></span>
+                        {{ __('app.restore_item') }}
                     </button>
                 @endif
 
@@ -281,7 +282,8 @@
                             <label class="form-label small text-muted mb-1">{{ __('app.find_by') }}</label>
                             <select name="filter" class="form-select" onchange="this.form.submit()">
                                 {{-- <option value="">{{ __('app.find_by') }}</option> --}}
-                                <option value="group_name" {{ request('filter', 'group_name') == 'group_name' ? 'selected' : '' }}>
+                                <option value="group_name"
+                                    {{ request('filter', 'group_name') == 'group_name' ? 'selected' : '' }}>
                                     {{ __('app.Search by group name...') }}
                                 </option>
                                 <option value="student_name" {{ request('filter') == 'student_name' ? 'selected' : '' }}>
@@ -372,14 +374,43 @@
                                 <th>{{ __('app.qty') }}</th>
                                 <th>{{ __('app.borrow_date') }}</th>
                                 <th>{{ __('app.return_date') }}</th>
-                                <th>{{ __('app.borrow_status') }}</th>
+                                <th>
+                                    <div class="position-relative d-inline-block">
+                                        <button type="button"
+                                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold small"
+                                            onclick="toggleFilter('statusDrop', null)">
+                                            {{ __('app.borrow_status') }}
+                                            @if (request('status_filter'))
+                                                <span
+                                                    class="text-primary">({{ ucfirst(strtolower(request('status_filter'))) }})</span>
+                                            @endif
+                                            <i class="bi bi-chevron-down ms-1" style="font-size:10px;"></i>
+                                        </button>
+                                        <div class="position-absolute bg-white border rounded-3 shadow-lg d-none col-filter-drop"
+                                            id="statusDrop"
+                                            style="z-index:1050; width:180px; left:0; top:100%; margin-top:6px;">
+                                            <div style="max-height:220px; overflow-y:auto;" class="py-1">
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_diff_key(request()->query(), ['status_filter' => '', 'page' => ''])) }}"
+                                                    class="d-block text-decoration-none px-3 py-2 small {{ !request('status_filter') ? 'fw-bold text-primary bg-light' : 'text-dark' }}">
+                                                    {{ __('app.all') }}
+                                                </a>
+                                                @foreach (['BORROWED', 'RETURNED', 'OVERDUE'] as $st)
+                                                    <a href="{{ url()->current() . '?' . http_build_query(array_merge(request()->query(), ['status_filter' => $st, 'page' => 1])) }}"
+                                                        class="d-block text-decoration-none px-3 py-2 small {{ request('status_filter') === $st ? 'fw-bold text-primary bg-light' : 'text-dark' }}">
+                                                        {{ ucfirst(strtolower($st)) }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </th>
                                 <th class="text-end" style="width:200px;">{{ __('app.Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($borrows ?? [] as $i => $borrow)
                                 <tr class="border-bottom" id="borrow-row-{{ $borrow->id }}">
-                                   <td>{{ ($borrows->currentPage() - 1) * $borrows->perPage() + $i + 1 }}</td>
+                                    <td>{{ ($borrows->currentPage() - 1) * $borrows->perPage() + $i + 1 }}</td>
                                     <td>
                                         <div class="fw-semibold">{{ $borrow->student->student_name ?? 'N/A' }}</div>
 
@@ -499,8 +530,8 @@
                                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                                 data-bs-target="#editBorrowModal" data-id="{{ $borrow->id }}"
                                                 data-student="{{ $borrow->student_id }}"
-                                                data-item="{{ $borrow->item_id }}" data-qty="{{ $borrow->qty }}" data-notes="{{ $borrow->notes }}"
-                                                style="margin-bottom: 5px">
+                                                data-item="{{ $borrow->item_id }}" data-qty="{{ $borrow->qty }}"
+                                                data-notes="{{ $borrow->notes }}" style="margin-bottom: 5px">
                                                 Edit
                                             </button>
                                         @endif
@@ -602,7 +633,8 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">{{ __('app.item') }} <span class="text-danger">*</span></label>
+                                <label class="form-label">{{ __('app.item') }} <span
+                                        class="text-danger">*</span></label>
                                 <select name="item_id" class="form-select" required>
                                     <option value="">-- {{ __('app.select_item') }} --</option>
                                     @foreach ($items as $it)
@@ -867,10 +899,10 @@
                                             {{ $it->display_name }}
 
                                             <!-- @if ($it->qty == 0)
-                                                (Out of stock)
-                                            @else
-                                                (Stock: {{ $it->qty }})
-                                            @endif -->
+    (Out of stock)
+@else
+    (Stock: {{ $it->qty }})
+    @endif -->
 
                                         </option>
                                     @endforeach
@@ -908,7 +940,7 @@
         </div>
     </div>
 
-        @include('backend.page.borrows.restoreBorrowModal')
+    @include('backend.page.borrows.restoreBorrowModal')
 
     {{-- <div class="modal fade" id="restoreBorrowModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -1384,9 +1416,9 @@
         }
     </script>
     <script>
-    function buildActionButtons(borrow) {
-        if (borrow.status === 'RETURNED') {
-            return `
+        function buildActionButtons(borrow) {
+            if (borrow.status === 'RETURNED') {
+                return `
                 ${buildViewButton(borrow)}
                 <form action="/admin/borrows/${borrow.id}/undo-return" method="POST" class="d-inline undo-return-form">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -1395,9 +1427,9 @@
                     </button>
                 </form>
             `;
-        }
- 
-        return `
+            }
+
+            return `
             <button class="btn btn-sm btn-outline-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#editBorrowModal"
@@ -1426,48 +1458,92 @@
                 Delete
             </button>
         `;
-    }
- 
-    // ── AJAX delete handler ──────────────────────────────────
-    document.addEventListener('click', async function (e) {
-        const btn = e.target.closest('.delete-borrow-btn');
-        if (!btn) return;
- 
-        e.preventDefault();
-        if (!confirm('Delete this borrow record?')) return;
- 
-        const id  = btn.dataset.id;
-        const row = document.getElementById(`borrow-row-${id}`);
- 
-        btn.disabled    = true;
-        btn.textContent = 'Deleting…';
- 
-        try {
-            const response = await fetch(`/admin/borrows/${id}`, {
-                method:  'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept':           'application/json',
-                    'X-CSRF-TOKEN':     document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
-                body: new URLSearchParams({ _method: 'DELETE' }),
-            });
- 
-            const data = await response.json();
- 
-            if (data.success) {
-                if (row) row.remove();
-                showAjaxMessage(data.message, 'success');
-            } else {
-                showAjaxMessage(data.message || 'Delete failed.', 'error');
-                btn.disabled    = false;
+        }
+
+        // ── AJAX delete handler ──────────────────────────────────
+        document.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.delete-borrow-btn');
+            if (!btn) return;
+
+            e.preventDefault();
+            if (!confirm('Delete this borrow record?')) return;
+
+            const id = btn.dataset.id;
+            const row = document.getElementById(`borrow-row-${id}`);
+
+            btn.disabled = true;
+            btn.textContent = 'Deleting…';
+
+            try {
+                const response = await fetch(`/admin/borrows/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                    },
+                    body: new URLSearchParams({
+                        _method: 'DELETE'
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (row) row.remove();
+                    showAjaxMessage(data.message, 'success');
+                } else {
+                    showAjaxMessage(data.message || 'Delete failed.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Delete';
+                }
+            } catch (err) {
+                showAjaxMessage('Something went wrong.', 'error');
+                btn.disabled = false;
                 btn.textContent = 'Delete';
             }
-        } catch (err) {
-            showAjaxMessage('Something went wrong.', 'error');
-            btn.disabled    = false;
-            btn.textContent = 'Delete';
+        });
+    </script>
+    <script>
+    function toggleFilter(dropId, searchId) {
+        event.stopPropagation();
+        document.querySelectorAll('.col-filter-drop').forEach(function(d) {
+            if (d.id !== dropId) d.classList.add('d-none');
+        });
+        var drop = document.getElementById(dropId);
+        drop.classList.toggle('d-none');
+
+        var tableWrap = document.querySelector('.table-responsive');
+        if (tableWrap) {
+            var anyOpen = document.querySelector('.col-filter-drop:not(.d-none)');
+            tableWrap.style.overflow = anyOpen ? 'visible' : '';
         }
+
+        if (!drop.classList.contains('d-none') && searchId) {
+            var input = document.getElementById(searchId);
+            input.value = '';
+            input.focus();
+        }
+    }
+
+    function searchList(inputId, listId) {
+        var search = document.getElementById(inputId).value.toLowerCase();
+        document.querySelectorAll('#' + listId + ' a').forEach(function(item) {
+            var name = item.getAttribute('data-name') || item.textContent.toLowerCase();
+            item.style.display = name.includes(search) ? '' : 'none';
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.col-filter-drop').forEach(function(d) {
+            var btn = d.parentElement.querySelector('button');
+            if (!d.contains(e.target) && !btn.contains(e.target)) {
+                d.classList.add('d-none');
+            }
+        });
+        var tableWrap = document.querySelector('.table-responsive');
+        if (tableWrap) tableWrap.style.overflow = '';
     });
 </script>
 @endsection

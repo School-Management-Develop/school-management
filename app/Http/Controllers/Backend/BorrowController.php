@@ -18,6 +18,7 @@ class BorrowController extends Controller
 {
     public function index(Request $request)
     {
+       
         Borrow::query()
             ->where('status', 'BORROWED')
             ->whereNull('return_date')
@@ -68,7 +69,20 @@ class BorrowController extends Controller
             ->orderByDesc('borrow_date')
             ->get();
 
-        $borrows = $query->orderByDesc('id')->paginate(20)->withQueryString();
+            // Status sort priority (not filter - shows all, just reorders)
+            $statusPriority = $request->get('status_filter', null);
+
+            if ($statusPriority) {
+                $query->orderByRaw("CASE WHEN status = ? THEN 0 ELSE 1 END", [$statusPriority]);
+            } else {
+                $query->orderByRaw("CASE status WHEN 'BORROWED' THEN 1 WHEN 'OVERDUE' THEN 2 WHEN 'RETURNED' THEN 3 ELSE 4 END");
+            }
+
+            $borrows = $query
+                ->orderByDesc('borrow_date')
+                ->paginate(20)
+                ->withQueryString();
+            // $borrows = $query->orderByDesc('id')->paginate(20)->withQueryString();
 
         $stats = [
             'total_records' => Borrow::count(),
