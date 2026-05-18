@@ -110,7 +110,7 @@
                 </h5>
 
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0 w-100">
+                    <table class="table align-middle mb-0 w-100 table-hover">
                         <thead>
                             <tr class="text-secondary small">
                                 <th style="width:80px;">#</th>

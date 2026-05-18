@@ -24,7 +24,10 @@ public function boot(): void
     View::composer('backend.layout.master', function ($view) {
         $pendingSubmissionCount = StudentSubmission::where('is_borrow_approved', false)->count();
 
-        $overdueCount = Borrow::where('status', 'OVERDUE')->count();
+        $overdueCount = Borrow::whereNull('return_date')
+            ->where('borrow_date', '<', now()->subDays(2))
+            ->whereIn('status', ['BORROWED', 'OVERDUE'])
+            ->count();
 
         $lateReturnedCount = Borrow::where('status', 'RETURNED')
             ->whereNotNull('return_date')

@@ -102,7 +102,7 @@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body" style="overflow: visible;">
                 <div class="table-responsive" style="overflow: visible;">
-                    <table class="table align-middle mb-0">
+                    <table class="table align-middle mb-0 table-hover">
                         <thead>
                             <tr class="text-secondary small">
                                 <th style="width:60px;">#</th>

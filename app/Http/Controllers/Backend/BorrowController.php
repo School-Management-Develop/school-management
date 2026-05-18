@@ -22,7 +22,7 @@ class BorrowController extends Controller
         Borrow::query()
             ->where('status', 'BORROWED')
             ->whereNull('return_date')
-            ->where('borrow_date', '<', now()->subDays(3))
+            ->where('borrow_date', '<', now()->subDays(2))
             ->update(['status' => 'OVERDUE']);
 
         $students = Student::orderBy('student_name')->get();
@@ -72,10 +72,8 @@ class BorrowController extends Controller
             // Status sort priority (not filter - shows all, just reorders)
             $statusPriority = $request->get('status_filter', null);
 
-            if ($statusPriority) {
-                $query->orderByRaw("CASE WHEN status = ? THEN 0 ELSE 1 END", [$statusPriority]);
-            } else {
-                $query->orderByRaw("CASE status WHEN 'BORROWED' THEN 1 WHEN 'OVERDUE' THEN 2 WHEN 'RETURNED' THEN 3 ELSE 4 END");
+            if ($request->filled('status_filter')) {
+                $query->orderByRaw("CASE WHEN status = ? THEN 0 ELSE 1 END", [$request->status_filter]);
             }
 
             $borrows = $query
@@ -373,6 +371,22 @@ class BorrowController extends Controller
             'notes' => $request->notes,
         ]);
 
+        $borrow->load(['student', 'item']);
+
+        ItemHistory::create([
+            'borrow_id'   => $borrow->id,
+            'student_id'  => $borrow->student_id,
+            'item_id'     => $borrow->item_id,
+            'user_id'     => Auth::id(),
+            'approved_by' => $borrow->approved_by,
+            'returned_by' => null,
+            'action'      => 'Edited',
+            'details'     => (Auth::user()?->name ?? 'System')
+                . ' updated borrow to ' . $newQty . ' x ' . ($borrow->item->name ?? '-')
+                . ' for ' . ($borrow->student->student_name ?? '-') . '.',
+            'action_at'   => now('Asia/Phnom_Penh'),
+        ]);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -435,11 +449,12 @@ class BorrowController extends Controller
 
     public function lateReturns(Request $request)
     {
-        $q = $request->q;
+        $q         = $request->q;
+        $lateTimes = $request->late_times;
 
-        $lateReturns = Borrow::with(['student', 'item'])
+        $query = Borrow::with(['student', 'item', 'calledByUser'])
             ->whereNotNull('return_date')
-            ->whereRaw('TIMESTAMPDIFF(HOUR, borrow_date, return_date) > 72')
+            ->whereRaw('TIMESTAMPDIFF(HOUR, borrow_date, return_date) >= 48')
             ->when($q, function ($query) use ($q) {
                 $query->whereHas('student', function ($s) use ($q) {
                     $s->where('student_name', 'like', "%$q%");
@@ -447,8 +462,40 @@ class BorrowController extends Controller
                     $i->where('name', 'like', "%$q%");
                 });
             })
+            ->when($lateTimes, function ($query) use ($lateTimes) {
+                $query->whereHas('student', function ($s) use ($lateTimes) {
+                    $lateStudentIds = Borrow::selectRaw('student_id')
+                        ->whereNotNull('return_date')
+                        ->whereRaw('TIMESTAMPDIFF(HOUR, borrow_date, return_date) >= 48')
+                        ->groupBy('student_id')
+                        ->havingRaw($lateTimes == '3' ? 'COUNT(*) >= 3' : 'COUNT(*) = ' . (int) $lateTimes)
+                        ->pluck('student_id');
+                    $s->whereIn('student_id', $lateStudentIds);
+                });
+            });
+
+        $lateCountMap = Borrow::selectRaw('student_id, COUNT(*) as late_count')
+            ->whereNotNull('return_date')
+            ->whereRaw('TIMESTAMPDIFF(HOUR, borrow_date, return_date) >= 48')
+            ->groupBy('student_id')
+            ->pluck('late_count', 'student_id');
+
+        $lateReturns = $query
             ->orderByDesc('return_date')
-            ->paginate(10);
+            ->paginate(20)
+            ->appends($request->query());
+
+        if ($request->late_sort === 'asc') {
+            $sorted = $lateReturns->getCollection()->sortBy(function ($b) use ($lateCountMap) {
+                return $lateCountMap[$b->student_id] ?? 0;
+            });
+            $lateReturns->setCollection($sorted->values());
+        } elseif ($request->late_sort === 'desc') {
+            $sorted = $lateReturns->getCollection()->sortByDesc(function ($b) use ($lateCountMap) {
+                return $lateCountMap[$b->student_id] ?? 0;
+            });
+            $lateReturns->setCollection($sorted->values());
+        }
 
         return view('backend.page.borrows.late_returns', compact('lateReturns'));
     }
@@ -476,7 +523,7 @@ class BorrowController extends Controller
 
         $overdues = $query
             ->orderBy('borrow_date', 'asc')
-            ->paginate(10)
+            ->paginate(20)
             ->appends($request->query());
 
         return view('backend.page.borrows.overdue', compact('overdues'));

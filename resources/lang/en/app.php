@@ -188,12 +188,12 @@ return [
     'delete all' => 'Delete all',
     'returned Late' => 'Returned Late',
     'overdue borrow' => 'Overdue Borrow',
-    'Students who returned items late (more than 3 days).' => 'Students who returned items late (more than 3 days).',
+    'Students who returned items late (more than 2 days).' => 'Students who returned items late (more than 2 days).',
     'Search student or item...' => 'Search student or item...',
     'Total Late Returns' => 'Total Late Returns',
     'Total Days late' => 'Total Days late',
     'days' => 'days',
-    'Borrowed more than 3 days and still not returned.' => 'Borrowed more than 3 days and still not returned.',
+    'Borrowed more than 2 days and still not returned.' => 'Borrowed more than 2 days and still not returned.',
     'Search student / phone / item...' => 'Search student / phone / item...',
     'Welcome back, :name' => 'Welcome back, :name',
     'find_by' => 'Find by',
@@ -307,5 +307,7 @@ return [
     'Telegram updated successfully.' => 'Telegram updated successfully.',
     'Telegram removed successfully.' => 'Telegram removed successfully.',
     'Telegram' => 'Telegram',
-    'Telegram username' => 'Telegram username'
+    'Telegram username' => 'Telegram username',
+    'Only admin can manage Telegram contacts.' => 'Only admin can manage Telegram contacts.',
+    
 ];

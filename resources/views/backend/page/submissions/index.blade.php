@@ -182,7 +182,7 @@
 
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body table-responsive">
-            <table class="table table-bordered align-middle">
+            <table class="table table-bordered align-middle ">
                 <thead>
                     <tr>
                         <th>{{ __('app.Student Name') }}</th>

@@ -72,7 +72,7 @@
         <div class="card border-0 shadow-sm rounded-4 mb-4 w-100">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0 w-100">
+                    <table class="table align-middle mb-0 w-100 table-hover">
                         <thead>
                             <tr class="text-secondary small">
                                 <th style="width:80px;">#</th>

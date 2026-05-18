@@ -69,7 +69,7 @@
 
         @include('backend.page.alerts.alert')
 
-        @if ($errors->any())
+        {{-- @if ($errors->any())
             <div class="alert alert-danger rounded-4">
                 <ul class="mb-0">
                     @foreach ($errors->all() as $e)
@@ -77,7 +77,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif --}}
 
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
             <div>
@@ -116,7 +116,7 @@
         <div class="card border-0 shadow-sm rounded-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table align-middle mb-0">
+                    <table class="table align-middle mb-0 table-hover">
                         <thead>
                             <tr class="text-secondary small">
                                 <th style="width:60px;">#</th>
@@ -139,35 +139,42 @@
 
                                     {{-- Telegram --}}
                                     <td>
-                                        @if ($u->telegram_username)
-                                            <div class="d-flex align-items-center gap-1">
-                                                <div class="tg-badge">
-                                                    <i class="bi bi-telegram"></i>
-                                                    {{ $u->telegram_username }}
-                                                    <span class="tg-active-label">ACTIVE</span>
+                                        @if (strtolower($u->role ?? '') === 'admin' ||
+                                                strtolower($u->role ?? '') === 'super admin' ||
+                                                strtolower($u->role ?? '') === 'superadmin')
+                                            @if ($u->telegram_username)
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <div class="tg-badge">
+                                                        <i class="bi bi-telegram"></i>
+                                                        {{ $u->telegram_username }}
+                                                        <span class="tg-active-label">ACTIVE</span>
+                                                    </div>
+
+                                                    <button class="tg-add" style="border-style:solid; padding:3px 6px;"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editTelegramModal{{ $u->id }}"
+                                                        title="Edit">
+                                                        <i class="bi bi-pencil" style="font-size:11px;"></i>
+                                                    </button>
+
+                                                    <form method="POST"
+                                                        action="{{ route('users.telegram.remove', $u->id) }}"
+                                                        class="d-inline"
+                                                        onsubmit="return confirm('Remove Telegram for {{ $u->name }}?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="tg-remove"
+                                                            title="Remove">&times;</button>
+                                                    </form>
                                                 </div>
-
-                                                {{-- Edit --}}
-                                                <button class="tg-add" style="border-style:solid; padding:3px 6px;"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#editTelegramModal{{ $u->id }}" title="Edit">
-                                                    <i class="bi bi-pencil" style="font-size:11px;"></i>
+                                            @else
+                                                <button class="tg-add" data-bs-toggle="modal"
+                                                    data-bs-target="#addTelegramModal{{ $u->id }}">
+                                                    <i class="bi bi-plus"></i> {{ __('app.Add Telegram') }}
                                                 </button>
-
-                                                {{-- Remove --}}
-                                                <form method="POST" action="{{ route('users.telegram.remove', $u->id) }}"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Remove Telegram for {{ $u->name }}?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="tg-remove" title="Remove">&times;</button>
-                                                </form>
-                                            </div>
+                                            @endif
                                         @else
-                                            <button class="tg-add" data-bs-toggle="modal"
-                                                data-bs-target="#addTelegramModal{{ $u->id }}">
-                                                <i class="bi bi-plus"></i> {{ __('app.Add Telegram') }}
-                                            </button>
+                                            <span class="text-muted small">—</span>
                                         @endif
                                     </td>
 
@@ -175,7 +182,8 @@
                                         @if (($u->status ?? 1) == 1)
                                             <span class="badge rounded-pill bg-success text-white px-3 py-2">Active</span>
                                         @else
-                                            <span class="badge rounded-pill bg-secondary text-white px-3 py-2">Inactive</span>
+                                            <span
+                                                class="badge rounded-pill bg-secondary text-white px-3 py-2">Inactive</span>
                                         @endif
                                     </td>
 
@@ -185,7 +193,8 @@
                                             <i class="bi bi-pencil"></i>
                                         </button>
 
-                                        <form action="{{ route('users.destroy', $u->id) }}" method="POST" class="d-inline">
+                                        <form action="{{ route('users.destroy', $u->id) }}" method="POST"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-outline-danger btn-sm"
@@ -223,26 +232,34 @@
                 <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label fw-semibold">{{ __('app.Name') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                            <label class="form-label fw-semibold">{{ __('app.Name') }} <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}"
+                                required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold">{{ __('app.Email') }} <span class="text-danger">*</span></label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+                            <label class="form-label fw-semibold">{{ __('app.Email') }} <span
+                                    class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" value="{{ old('email') }}"
+                                required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold">{{ __('app.Password') }} <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">{{ __('app.Password') }} <span
+                                    class="text-danger">*</span></label>
                             <input type="password" name="password" class="form-control" minlength="6" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">{{ __('app.Role') }} <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">{{ __('app.Role') }} <span
+                                    class="text-danger">*</span></label>
                             <select name="role" class="form-select" required>
-                                <option value="admin" {{ old('role', 'admin') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="admin" {{ old('role', 'admin') == 'admin' ? 'selected' : '' }}>Admin
+                                </option>
                                 <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">{{ __('app.Status') }} <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold">{{ __('app.Status') }} <span
+                                    class="text-danger">*</span></label>
                             <select name="status" class="form-select" required>
                                 <option value="1" selected>Active</option>
                                 <option value="0">Inactive</option>
@@ -272,29 +289,38 @@
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-12">
-                                <label class="form-label fw-semibold">{{ __('app.Name') }} <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control" value="{{ $u->name }}" required>
+                                <label class="form-label fw-semibold">{{ __('app.Name') }} <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control" value="{{ $u->name }}"
+                                    required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">{{ __('app.Email') }} <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control" value="{{ $u->email }}" required>
+                                <label class="form-label fw-semibold">{{ __('app.Email') }} <span
+                                        class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control" value="{{ $u->email }}"
+                                    required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">{{ __('app.Password') }} <small class="text-muted">(optional)</small></label>
+                                <label class="form-label fw-semibold">{{ __('app.Password') }} <small
+                                        class="text-muted">(optional)</small></label>
                                 <input type="password" name="password" class="form-control" minlength="6">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
                                 <select name="role" class="form-select" required>
-                                    <option value="admin" {{ old('role', $u->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="staff" {{ old('role', $u->role) == 'staff' ? 'selected' : '' }}>Staff</option>
+                                    <option value="admin" {{ old('role', $u->role) == 'admin' ? 'selected' : '' }}>Admin
+                                    </option>
+                                    <option value="staff" {{ old('role', $u->role) == 'staff' ? 'selected' : '' }}>Staff
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                                 <select name="status" class="form-select" required>
-                                    <option value="1" {{ old('status', $u->status ?? 1) == 1 ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old('status', $u->status ?? 1) == 0 ? 'selected' : '' }}>Inactive</option>
+                                    <option value="1" {{ old('status', $u->status ?? 1) == 1 ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="0" {{ old('status', $u->status ?? 1) == 0 ? 'selected' : '' }}>
+                                        Inactive</option>
                                 </select>
                             </div>
                         </div>
@@ -329,7 +355,8 @@
                                 <div class="text-muted small">{{ $u->email }}</div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">{{ __('app.Telegram username') }} <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold">{{ __('app.Telegram username') }} <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">t.me/</span>
                                     <input type="text" name="telegram_username" class="form-control"
@@ -338,8 +365,10 @@
                             </div>
                         </div>
                         <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
-                            <button type="submit" class="btn btn-dark"><i class="bi bi-check2-circle me-1"></i> {{ __('app.Save') }}</button>
+                            <button type="button" class="btn btn-light"
+                                data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
+                            <button type="submit" class="btn btn-dark"><i class="bi bi-check2-circle me-1"></i>
+                                {{ __('app.Save') }}</button>
                         </div>
                     </form>
                 </div>
@@ -368,7 +397,8 @@
                                 <div class="text-muted small">{{ $u->email }}</div>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">{{ __('app.Telegram username') }} <span class="text-danger">*</span></label>
+                                <label class="form-label fw-semibold">{{ __('app.Telegram username') }} <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text">t.me/</span>
                                     <input type="text" name="telegram_username" class="form-control"
@@ -377,8 +407,10 @@
                             </div>
                         </div>
                         <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
-                            <button type="submit" class="btn btn-dark"><i class="bi bi-check2-circle me-1"></i> {{ __('app.Update') }}</button>
+                            <button type="button" class="btn btn-light"
+                                data-bs-dismiss="modal">{{ __('app.Cancel') }}</button>
+                            <button type="submit" class="btn btn-dark"><i class="bi bi-check2-circle me-1"></i>
+                                {{ __('app.Update') }}</button>
                         </div>
                     </form>
                 </div>

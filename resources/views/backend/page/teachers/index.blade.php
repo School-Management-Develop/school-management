@@ -78,7 +78,7 @@
     {{-- Table --}}
     <div class="card border-0 shadow-sm rounded-4" style="overflow:hidden;">
     <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table align-middle mb-0 table-hover">
                 <thead class="border-bottom">
                     <tr>
                         <th style="width:50px;">#</th>

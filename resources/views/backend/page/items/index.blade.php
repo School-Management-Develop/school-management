@@ -106,7 +106,7 @@
         <div class="card-body">
 
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 table-hover">
                     <thead>
                         <tr class="text-secondary small">
                             <th style="width:60px;">#</th>

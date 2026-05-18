@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -87,6 +88,10 @@ class UserController extends Controller
     }
     public function updateTelegram(Request $request, User $user)
     {
+        if (!in_array(strtolower($user->role ?? ''), ['admin', 'super admin', 'superadmin'])) {
+            return back()->withErrors(['error' => __('app.Only admin users can have Telegram contacts.')]);
+        }
+
         $request->validate([
             'telegram_username' => 'required|string|max:255',
         ]);

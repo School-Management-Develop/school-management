@@ -47,7 +47,10 @@ class DashboardController extends Controller
 
         $pendingSubmissions = StudentSubmission::where('is_borrow_approved', false)->count();
 
-        $overdueCount = Borrow::where('status', 'OVERDUE')->count();
+        $overdueCount = Borrow::whereNull('return_date')
+            ->where('borrow_date', '<', now()->subDays(2))
+            ->whereIn('status', ['BORROWED', 'OVERDUE'])
+            ->count();
 
         $recentSubmissions = StudentSubmission::with(['group', 'item'])
             ->latest()
