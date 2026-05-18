@@ -313,4 +313,9 @@ return [
     'User deleted successfully.' => 'User deleted successfully.',
     'Restore Users' => 'Restore Users',
     'User restored successfully.' => 'User restored successfully.',
+    'Cannot delete an active item. Please set the item to inactive first.' => 'Cannot delete an active item. Please set the item to inactive first.',
+    'Item deleted!' => 'Item deleted!',
+    'Restore Items' => 'Restore Items',
+    'Item restored successfully.' => 'Item restored successfully.',
+    'Are you sure you want to restore the selected items?' => 'Are you sure you want to restore the selected items?',
 ];

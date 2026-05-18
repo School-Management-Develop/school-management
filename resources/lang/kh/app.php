@@ -312,4 +312,9 @@ return [
     'User deleted successfully.' => 'បានលុបអ្នកប្រើប្រាស់ដោយជោគជ័យ។',
     'Restore Users' => 'ស្តារអ្នកប្រើប្រាស់',
     'User restored successfully.' => 'បានស្តារអ្នកប្រើប្រាស់ដោយជោគជ័យ។',
+    'Cannot delete an active item. Please set the item to inactive first.' => 'មិនអាចលុបសម្ភារៈដែលសកម្មបានទេ។ សូមកំណត់សម្ភារៈទៅអសកម្មជាមុនសិន។',
+    'Item deleted!' => 'បានលុបសម្ភារៈ!',
+    'Restore Items' => 'ស្តារសម្ភារៈ',
+    'Item restored successfully.' => 'បានស្តារសម្ភារៈដោយជោគជ័យ។',
+    'Are you sure you want to restore the selected items?' => 'តើអ្នកប្រាកដថាចង់ស្ដារឡើងវិញសម្ភារៈដែលបានជ្រើសរើសទេ?',
 ];

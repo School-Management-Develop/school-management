@@ -147,10 +147,13 @@ Route::middleware(['auth', 'role:admin,staff'])
         |--------------------------------------------------------------------------
         */
         Route::get('/items', [ItemController::class, 'index'])->name('items.index');
+        Route::get('/items/trashed', [ItemController::class, 'trashed'])->name('items.trashed');
+        Route::get('/items/action-logs', [ItemController::class, 'actionLogs'])->name('items.action_logs');
         Route::get('/items/{itemid}', [ItemController::class, 'show'])->name('items.show');
         Route::post('/items', [ItemController::class, 'store'])->name('items.store');
         Route::put('/items/{itemid}', [ItemController::class, 'update'])->name('items.update');
         Route::delete('/items/{itemid}', [ItemController::class, 'destroy'])->name('items.destroy');
+        Route::patch('/items/{itemid}/restore', [ItemController::class, 'restore'])->name('items.restore');
 
         /*
         |--------------------------------------------------------------------------

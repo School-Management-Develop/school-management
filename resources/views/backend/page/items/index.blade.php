@@ -68,6 +68,12 @@
             <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addItemModal">
                 <i class="bi bi-plus-lg me-1"></i> {{ __('app.add_item') }}
             </button>
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#restoreItemModal">
+                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('app.Restore Items') }}
+            </button>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#itemActionLogsModal">
+                <i class="bi bi-journal-text me-1"></i> View Logs
+            </button>
         </div>
     </div>
 
@@ -396,7 +402,223 @@
 </div>
 </div>
 @endforeach
+{{-- Item Action Logs Modal --}}
+<div class="modal fade" id="itemActionLogsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-journal-text me-2"></i>Item Action Logs
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
 
+            <div class="modal-body p-0">
+                {{-- Search bar --}}
+                <div class="px-3 pt-3 pb-2">
+                    <div class="input-group" style="max-width:420px;">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" id="logsSearchInput" class="form-control border-start-0 "
+                            placeholder="Search item or user...">
+                        <button class="btn btn-primary" id="logsSearchBtn">Search</button>
+                        <button class="btn btn-danger" id="logsResetBtn">Reset</button>
+                    </div>
+                </div>
+
+                {{-- Loading --}}
+                <div id="logsLoadingRow" class="text-center py-4 text-muted d-none">
+                    <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+                </div>
+
+                {{-- Table --}}
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="text-secondary small">
+                                <th style="width:50px;">#</th>
+                                <th>Item</th>
+                                <th style="width:110px;">Action</th>
+                                <th>Details</th>
+                                <th style="width:130px;">By</th>
+                                <th class="text-center" style="width:150px;">Date & Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="px-3 py-2 d-flex justify-content-between align-items-center">
+                    <span class="text-muted small" id="logsTotalCount"></span>
+                    <div id="logsPagination" class="d-flex gap-2"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let logsCurrentPage = 1;
+    let logsCurrentQ = '';
+
+    function loadLogs(page = 1, q = '') {
+    const body    = document.getElementById('logsTableBody');
+    const loading = document.getElementById('logsLoadingRow');
+    const total   = document.getElementById('logsTotalCount');
+    const pagination = document.getElementById('logsPagination');
+
+    loading.classList.remove('d-none');
+    body.innerHTML = '';
+
+    fetch(`{{ route('items.action_logs') }}?page=${page}&q=${encodeURIComponent(q)}`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Server error: ' + res.status);
+        return res.json();
+    })
+    .then(data => {
+        loading.classList.add('d-none');
+        body.innerHTML = data.html || '';
+        total.textContent = (data.total ?? 0) + ' log(s) found';
+
+        pagination.innerHTML = '';
+        if (data.prev_page) {
+            pagination.innerHTML += `<button class="btn btn-sm btn-outline-secondary" onclick="loadLogs(${data.prev_page}, '${q}')">← Prev</button>`;
+        }
+        if (data.next_page) {
+            pagination.innerHTML += `<button class="btn btn-sm btn-outline-secondary" onclick="loadLogs(${data.next_page}, '${q}')">Next →</button>`;
+        }
+    })
+    .catch(err => {
+        loading.classList.add('d-none');
+        body.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-3">Failed to load logs. Check if migration has been run.</td></tr>';
+        total.textContent = '';
+        console.error('Logs error:', err);
+    });
+}
+
+    // Open modal → load logs
+    document.getElementById('itemActionLogsModal').addEventListener('show.bs.modal', function () {
+        logsCurrentPage = 1;
+        logsCurrentQ = '';
+        document.getElementById('logsSearchInput').value = '';
+        loadLogs(1, '');
+    });
+
+    // Search
+    document.getElementById('logsSearchBtn').addEventListener('click', function () {
+        logsCurrentQ = document.getElementById('logsSearchInput').value;
+        loadLogs(1, logsCurrentQ);
+    });
+
+    // Reset
+    document.getElementById('logsResetBtn').addEventListener('click', function () {
+        logsCurrentQ = '';
+        document.getElementById('logsSearchInput').value = '';
+        loadLogs(1, '');
+    });
+
+    // Search on Enter key
+    document.getElementById('logsSearchInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            logsCurrentQ = this.value;
+            loadLogs(1, logsCurrentQ);
+        }
+    });
+</script>
+{{-- Restore Item Modal --}}
+<div class="modal fade" id="restoreItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-arrow-clockwise me-2"></i>{{ __('app.Restore Items') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                {{-- Loading state --}}
+                <div id="restoreLoadingRow" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+                </div>
+                {{-- Table --}}
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="text-secondary small">
+                            <th>#</th>
+                            <th>{{ __('app.item_name') }}</th>
+                            <th>Khmer Name</th>
+                            <th class="text-center">Qty</th>
+                            <th>Status</th>
+                            <th>Deleted At</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="trashedItemsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer border-0">
+                <span class="text-muted small me-auto" id="trashedItemCount"></span>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load trashed items when modal opens
+    document.getElementById('restoreItemModal').addEventListener('show.bs.modal', function () {
+        const body = document.getElementById('trashedItemsBody');
+        const loading = document.getElementById('restoreLoadingRow');
+        const count = document.getElementById('trashedItemCount');
+
+        loading.classList.remove('d-none');
+        body.innerHTML = '';
+
+        fetch("{{ route('items.trashed') }}", {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            loading.classList.add('d-none');
+            body.innerHTML = data.html;
+            count.textContent = data.total + ' deleted item(s)';
+        });
+    });
+    document.getElementById('restoreItemModal').addEventListener('click', function (e) {
+    if (e.target.classList.contains('btn-restore') || e.target.closest('.btn-restore')) {
+        const btn = e.target.closest('.btn-restore');
+        const form = btn.closest('.restore-form');
+
+        Swal.fire({
+            title: 'Restore Item?',
+            text: 'Are you sure you want to restore this item?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-arrow-clockwise me-1"></i> Yes, Restore',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+});
+</script>
 {{-- Delete Confirmation with Password --}}
 <script>
 function confirmDelete(id) {

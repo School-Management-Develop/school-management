@@ -8,6 +8,8 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ItemActionLog;
+use Illuminate\Support\Facades\Auth;
 
 class ItemController extends Controller
 {
@@ -64,6 +66,15 @@ class ItemController extends Controller
             'borrow'      => 0,
         ]);
 
+        ItemActionLog::create([
+            'item_id'   => $item->Itemid,
+            'item_name' => $item->name,
+            'user_id'   => Auth::id(),
+            'action'    => 'Created',
+            'details'   => Auth::user()->name . ' created item "' . $item->name . '" with qty ' . $item->qty,
+            'action_at' => now('Asia/Phnom_Penh'),
+        ]);
+
         return back()->with('success', __('app.Item added successfully!'));
     }
 
@@ -88,6 +99,25 @@ class ItemController extends Controller
             $path = $request->file('image')->storePublicly('items');
         }
 
+        // Track what changed
+        $changes = [];
+        if ($item->name !== $request->name) $changes[] = 'name: "' . $item->name . '" → "' . $request->name . '"';
+        if ($item->name_kh !== $request->name_kh) $changes[] = 'name_kh changed';
+        if ($item->qty != $request->qty) $changes[] = 'qty: ' . $item->qty . ' → ' . $request->qty;
+        if ($item->status != $request->status) $changes[] = 'status: ' . ($item->status ? 'Active' : 'Inactive') . ' → ' . ($request->status ? 'Active' : 'Inactive');
+        if ($request->hasFile('image')) $changes[] = 'image updated';
+
+        $item->save();
+
+        ItemActionLog::create([
+            'item_id'   => $item->Itemid,
+            'item_name' => $item->name,
+            'user_id'   => Auth::id(),
+            'action'    => 'Updated',
+            'details'   => Auth::user()->name . ' updated item "' . $item->name . '"'
+                        . (count($changes) ? ': ' . implode(', ', $changes) : ''),
+            'action_at' => now('Asia/Phnom_Penh'),
+        ]);
         $item->image       = $path;
         $item->name        = $request->name;
         $item->name_kh     = $request->name_kh;
@@ -114,10 +144,49 @@ class ItemController extends Controller
         if ($item->image) {
             Storage::delete($item->image);
         }
-
+        if (($item->status ?? 1) == 1) {
+                return back()->withErrors(['error' => __('app.Cannot delete an active item. Please set the item to inactive first.')]);
+            }
         $item->delete();
 
+        ItemActionLog::create([
+            'item_id'   => $item->Itemid,
+            'item_name' => $item->name,
+            'user_id'   => Auth::id(),
+            'action'    => 'Deleted',
+            'details'   => Auth::user()->name . ' deleted item "' . $item->name . '"',
+            'action_at' => now('Asia/Phnom_Penh'),
+        ]);
         return redirect()->route('items.index')->with('success', __('app.Item deleted!'));
+    }
+    public function trashed()
+    {
+        $trashedItems = Item::onlyTrashed()->latest('deleted_at')->get();
+
+        if (request()->ajax()) {
+            return response()->json([
+                'html'  => view('backend.page.items.trashed-rows', compact('trashedItems'))->render(),
+                'total' => $trashedItems->count(),
+            ]);
+        }
+
+        return back();
+    }
+    public function restore($id)
+    {
+        $item = Item::onlyTrashed()->findOrFail($id);
+        $item->restore();
+
+        ItemActionLog::create([
+            'item_id'   => $item->Itemid,
+            'item_name' => $item->name,
+            'user_id'   => Auth::id(),
+            'action'    => 'Restored',
+            'details'   => Auth::user()->name . ' restored item "' . $item->name . '"',
+            'action_at' => now('Asia/Phnom_Penh'),
+        ]);
+
+        return back()->with('success', __('app.Item restored successfully.'));
     }
 
     public function show($itemid)
@@ -132,4 +201,30 @@ class ItemController extends Controller
 
         return view('backend.page.items.show', compact('item', 'available', 'borrowed'));
     }
+public function actionLogs(Request $request)
+{
+    $q = $request->q;
+
+    $logs = ItemActionLog::with('user')
+        ->when($q, function ($query) use ($q) {
+            $query->where('item_name', 'like', "%$q%")
+                  ->orWhereHas('user', function ($u) use ($q) {
+                      $u->where('name', 'like', "%$q%");
+                  });
+        })
+        ->latest('action_at')
+        ->paginate(20)
+        ->appends($request->query());
+
+    if ($request->ajax() || $request->wantsJson()) {
+        return response()->json([
+            'html'      => view('backend.page.items.action_logs_rows', compact('logs'))->render(),
+            'total'     => $logs->total(),
+            'next_page' => $logs->hasMorePages() ? $logs->currentPage() + 1 : null,
+            'prev_page' => $logs->currentPage() > 1 ? $logs->currentPage() - 1 : null,
+        ]);
+    }
+
+    return view('backend.page.items.action_logs', compact('logs'));
+}
 }
