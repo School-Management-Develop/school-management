@@ -309,5 +309,8 @@ return [
     'Telegram' => 'Telegram',
     'Telegram username' => 'Telegram username',
     'Only admin can manage Telegram contacts.' => 'Only admin can manage Telegram contacts.',
-    
+    'Cannot delete an active user. Please set the user to inactive first.' => 'Cannot delete an active user. Please set the user to inactive first.',
+    'User deleted successfully.' => 'User deleted successfully.',
+    'Restore Users' => 'Restore Users',
+    'User restored successfully.' => 'User restored successfully.',
 ];

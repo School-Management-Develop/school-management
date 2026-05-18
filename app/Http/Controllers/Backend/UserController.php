@@ -76,16 +76,15 @@ class UserController extends Controller
     }
 
     public function destroy(User $user)
-    {
-        // prevent deleting yourself
-        //     if (auth()->check() && auth()->id() === $user->id) {
-        //     return back()->withErrors(['delete' => 'You cannot delete your own account.']);
-        //  }
+        {
+            if (($user->status ?? 1) == 1) {
+                return back()->withErrors(['error' => __('app.Cannot delete an active user. Please set the user to inactive first.')]);
+            }
 
-        $user->delete();
+            $user->delete(); // soft delete — sets deleted_at, keeps in database
 
-        return back()->with('success', 'app.User deleted successfully.');
-    }
+            return back()->with('success', __('app.User deleted successfully.'));
+        }
     public function updateTelegram(Request $request, User $user)
     {
         if (!in_array(strtolower($user->role ?? ''), ['admin', 'super admin', 'superadmin'])) {
@@ -108,5 +107,22 @@ class UserController extends Controller
         $user->update(['telegram_username' => null]);
 
         return back()->with('success', __('app.Telegram removed successfully.'));
+    }
+    public function trashed()
+    {
+        $trashedUsers = User::onlyTrashed()->latest('deleted_at')->get();
+
+        return response()->json([
+            'html' => view('backend.page.users.trashed-rows', compact('trashedUsers'))->render(),
+            'total' => $trashedUsers->count(),
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+
+        return back()->with('success', __('app.User restored successfully.'));
     }
 }

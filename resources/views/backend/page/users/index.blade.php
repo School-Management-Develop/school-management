@@ -99,6 +99,9 @@
                 <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addUserModal">
                     <i class="bi bi-plus-lg me-1"></i> {{ __('app.Add User') }}
                 </button>
+                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#restoreUserModal">
+                    <i class="bi bi-arrow-clockwise me-1"></i> {{ __('app.Restore Users') }}
+                </button>
             </div>
         </div>
 
@@ -417,5 +420,42 @@
             </div>
         @endif
     @endforeach
+            {{-- Restore Users Modal --}}
+<div class="modal fade" id="restoreUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-arrow-clockwise me-2"></i>{{ __('app.Restore Users') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="trashedUsersBody">
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary"></div> Loading...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('app.close') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('restoreUserModal')?.addEventListener('show.bs.modal', function () {
+        var body = document.getElementById('trashedUsersBody');
+        body.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Loading...</div>';
 
+        fetch('{{ route("users.trashed") }}', {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            body.innerHTML = '<div class="table-responsive"><table class="table align-middle mb-0"><thead><tr class="text-secondary small"><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Deleted at</th><th class="text-end">Action</th></tr></thead><tbody>' + data.html + '</tbody></table></div>';
+        })
+        .catch(() => {
+            body.innerHTML = '<div class="text-center text-danger py-3">Failed to load</div>';
+        });
+    });
+</script>
 @endsection

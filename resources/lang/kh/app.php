@@ -308,4 +308,8 @@ return [
     'Telegram removed successfully.' => 'បានលុប Telegram ដោយជោគជ័យ។',
     'Telegram' => 'Telegram',
     'Telegram username' => 'ឈ្មោះអ្នកប្រើ Telegram',
+    'Cannot delete an active user. Please set the user to inactive first.' => 'មិនអាចលុបអ្នកប្រើប្រាស់ដែលសកម្មបានទេ។ សូមកំណត់អ្នកប្រើប្រាស់ទៅអសកម្មជាមុនសិន។',
+    'User deleted successfully.' => 'បានលុបអ្នកប្រើប្រាស់ដោយជោគជ័យ។',
+    'Restore Users' => 'ស្តារអ្នកប្រើប្រាស់',
+    'User restored successfully.' => 'បានស្តារអ្នកប្រើប្រាស់ដោយជោគជ័យ។',
 ];
