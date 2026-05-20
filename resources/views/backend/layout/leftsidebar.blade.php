@@ -555,7 +555,7 @@ $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
             </div>
         </div>
         <h6 class="text-center text-secondary opacity-50 mt-4" style="font-size: 0.75rem; letter-spacing: 1px;">
-            RELEASE 1.3
+            RELEASE 2.0
         </h6>
     </aside>
     {{-- </div> --}}
