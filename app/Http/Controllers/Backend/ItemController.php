@@ -55,7 +55,7 @@ class ItemController extends Controller
             $path = $request->file('image')->storePublicly('items');
         }
 
-        Item::create([
+        $item = Item::create([
             'name'        => $request->name,
             'name_kh'     => $request->name_kh,
             'qty'         => $request->qty,
