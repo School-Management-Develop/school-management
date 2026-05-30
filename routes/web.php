@@ -89,6 +89,7 @@ Route::middleware('auth')->get('/dashboard', function () {
         : redirect()->route('student.register');
 })->name('dashboard');
 
+
 /*
 |--------------------------------------------------------------------------
 | Profile
@@ -190,6 +191,8 @@ Route::middleware(['auth', 'role:admin,staff'])
         | Submissions
         |--------------------------------------------------------------------------
         */
+        Route::get('/submissions/live', [SubmissionController::class, 'liveData'])
+        ->name('submissions.live');
         Route::get('/submissions', [SubmissionController::class, 'index'])->name('submissions.index');
         Route::post('/submissions', [SubmissionController::class, 'store'])->name('submissions.store');
 

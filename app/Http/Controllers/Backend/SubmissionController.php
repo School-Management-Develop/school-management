@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Models\StudentSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SubmissionController extends Controller
 {
@@ -18,7 +19,7 @@ class SubmissionController extends Controller
         $q = $request->get('q');
 
         $submissions = StudentSubmission::query()
-            ->with('group')
+            ->with('group' ,'item')
             ->when($q, function ($query) use ($q) {
                 $query->where('student_name', 'like', "%{$q}%")
                     ->orWhere('phone_number', 'like', "%{$q}%");
@@ -380,4 +381,61 @@ class SubmissionController extends Controller
     return back()->with('success', __('app.Student group changed successfully. Now you can approve borrow.'));
 }
 
+
+public function liveData(Request $request)
+{
+    $q = $request->get('q');
+
+    $submissions = StudentSubmission::query()
+        ->with(['group', 'item'])
+        ->when($q, function ($query) use ($q) {
+            $query->where('student_name', 'like', "%{$q}%")
+                  ->orWhere('phone_number', 'like', "%{$q}%");
+        })
+        ->latest()
+        ->get()
+        ->map(function ($sub) {
+            $matchStatus = null;
+            if (!empty($sub->phone_number)) {
+                $existing = Student::where('phone_number', $sub->phone_number)->first();
+                if ($existing) {
+                    $matchStatus = ((int) $existing->group_id === (int) $sub->group_id)
+                        ? 'same_group' : 'different_group';
+                }
+            }
+
+            // Item name
+            $itemName = '-';
+            if ($sub->item && $sub->item_id) {
+                $itemName = $sub->item->display_name;
+            } elseif ($sub->other_item) {
+                $itemName = 'Other (' . $sub->other_item . ')';
+            }
+
+            // Image URL
+            $imageUrl = null;
+            if (!empty($sub->item?->image)) {
+                $imageUrl = Storage::url($sub->item->image);
+            }
+
+            return [
+                'id'                 => $sub->id,
+                'student_name'       => $sub->student_name,
+                'phone_number'       => $sub->phone_number,
+                'group_name'         => $sub->group->group_name ?? '-',
+                'qty'                => $sub->qty,
+                'note'               => $sub->note ?? '-',
+                'is_borrow_approved' => $sub->is_borrow_approved,
+                'match_status'       => $matchStatus,
+                'student_id'         => $sub->student_id,
+                'item_name'          => $itemName,
+                'image_url'          => $imageUrl,
+            ];
+        });
+
+    return response()->json([
+        'submissions' => $submissions,
+        'total'       => $submissions->count(),
+    ]);
+}
 }
