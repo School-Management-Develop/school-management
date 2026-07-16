@@ -25,6 +25,10 @@ class StudentController extends Controller
         $studentsQuery->where('group_id', $request->group_id);
 }
 
+        if ($request->filled('status')) {
+            $studentsQuery->where('status', $request->status);
+        }
+
         // Borrow count sort
         if ($request->filled('borrow_sort')) {
             $studentsQuery->orderBy('borrows_count', $request->borrow_sort);
@@ -79,16 +83,22 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $messages = [
-            'phone_number.unique' => 'This phone number already exists.',
+            'phone_number.unique'        => 'This phone number already exists.',
+            'inactive_note.required_if' => 'Please provide a note explaining why this student is inactive.',
         ];
 
         $data = $request->validate([
-            'student_name' => ['required', 'string', 'max:255'],
-            'gender'       => ['required', 'in:Male,Female'],
-            'phone_number' => ['nullable', 'string', 'max:50', 'unique:students,phone_number'],
-            'group_id'     => ['required', 'exists:groups,group_id'],
-            'status'       => ['required', 'in:0,1'],
+            'student_name'  => ['required', 'string', 'max:255'],
+            'gender'        => ['required', 'in:Male,Female'],
+            'phone_number'  => ['nullable', 'string', 'max:50', 'unique:students,phone_number'],
+            'group_id'      => ['required', 'exists:groups,group_id'],
+            'status'        => ['required', 'in:0,1'],
+            'inactive_note' => ['required_if:status,0', 'nullable', 'string', 'max:1000'],
         ], $messages);
+
+        if ((int) $data['status'] === 1) {
+            $data['inactive_note'] = null;
+        }
 
         // Rule::unique cannot be used here because it passes the raw input
         // to SQL. We normalize first, then check manually.
@@ -123,7 +133,8 @@ class StudentController extends Controller
         $student = Student::where('student_id', $student_id)->firstOrFail();
 
         $messages = [
-            'phone_number.unique' => 'This phone number already exists.',
+            'phone_number.unique'        => 'This phone number already exists.',
+            'inactive_note.required_if' => 'Please provide a note explaining why this student is inactive.',
         ];
 
         $data = $request->validate([
@@ -135,9 +146,14 @@ class StudentController extends Controller
                 'max:50',
                 Rule::unique('students', 'phone_number')->ignore($student->student_id, 'student_id'),
             ],
-            'group_id' => ['required', 'exists:groups,group_id'],
-            'status'   => ['required', 'in:0,1'],
+            'group_id'      => ['required', 'exists:groups,group_id'],
+            'status'        => ['required', 'in:0,1'],
+            'inactive_note' => ['required_if:status,0', 'nullable', 'string', 'max:1000'],
         ], $messages);
+
+        if ((int) $data['status'] === 1) {
+            $data['inactive_note'] = null;
+        }
 
         $normalized = strtolower(
             preg_replace('/[\s\x{200B}\x{200C}\x{FEFF}\x{00A0}]+/u', '', $request->student_name)

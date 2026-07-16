@@ -318,4 +318,6 @@ return [
     'Restore Items' => 'Restore Items',
     'Item restored successfully.' => 'Item restored successfully.',
     'Are you sure you want to restore the selected items?' => 'Are you sure you want to restore the selected items?',
+    'Inactive Note' => 'Inactive Note',
+    'Explain why this student is inactive...' => 'Explain why this student is inactive...',
 ];

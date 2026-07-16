@@ -151,7 +151,39 @@
                                     </div>
                                 </th>
 
-                                <th>{{ __('app.Status') }}</th>
+                                {{-- Status Filter Column --}}
+                                <th style="position: relative; overflow: visible;">
+                                    <div class="position-relative d-inline-block" style="overflow: visible;">
+                                        <button type="button"
+                                            class="btn btn-link text-dark text-decoration-none p-0 fw-semibold small"
+                                            id="statusFilterBtn" onclick="toggleStatusDropdown(event)">
+                                            {{ __('app.Status') }}
+                                            @if (request('status') !== null && request('status') !== '')
+                                                <span class="text-primary">
+                                                    ({{ request('status') == '1' ? __('app.active_students') : __('app.inactive_students') }})
+                                                </span>
+                                            @endif
+                                            <i class="bi bi-chevron-down ms-1" style="font-size: 10px;"></i>
+                                        </button>
+
+                                        <div class="position-absolute bg-white border rounded-3 shadow-lg p-2 d-none"
+                                            id="statusFilterDropdown"
+                                            style="z-index: 1055; min-width: 180px; left: 0; top: calc(100% + 6px);">
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_diff_key(request()->query(), ['status' => '', 'page' => ''])) }}"
+                                                class="dropdown-item rounded-2 px-2 py-1 small {{ request('status') === null || request('status') === '' ? 'fw-bold text-primary bg-light' : '' }}">
+                                                {{ __('app.all') }}
+                                            </a>
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge(request()->query(), ['status' => 1, 'page' => 1])) }}"
+                                                class="dropdown-item rounded-2 px-2 py-1 small {{ request('status') == '1' ? 'fw-bold text-primary bg-light' : '' }}">
+                                                {{ __('app.active_students') }}
+                                            </a>
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge(request()->query(), ['status' => 0, 'page' => 1])) }}"
+                                                class="dropdown-item rounded-2 px-2 py-1 small {{ request('status') === '0' ? 'fw-bold text-primary bg-light' : '' }}">
+                                                {{ __('app.inactive_students') }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </th>
                                 <th>
                                     <div class="position-relative d-inline-block">
                                         <button type="button"
@@ -206,7 +238,8 @@
                                                 {{ __('app.active_students') }}
                                             </span>
                                         @else
-                                            <span class="badge rounded-pill bg-secondary text-white px-3 py-2">
+                                            <span class="badge rounded-pill bg-secondary text-white px-3 py-2"
+                                                @if ($s->inactive_note) data-bs-toggle="tooltip" title="{{ $s->inactive_note }}" @endif>
                                                 {{ __('app.inactive_students') }}
                                             </span>
                                         @endif
@@ -328,13 +361,26 @@
                             <label class="form-label fw-semibold">
                                 {{ __('app.Status') }} <span class="text-danger">*</span>
                             </label>
-                            <select name="status" class="form-select rounded-3 py-2" required>
+                            <select name="status" class="form-select rounded-3 py-2" id="add_status" required
+                                onchange="toggleInactiveNote(this, 'add')">
                                 <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>
                                     {{ __('app.active') }}</option>
                                 <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>
                                     {{ __('app.inactive') }}</option>
                             </select>
                             @error('status')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-12 {{ old('status', '1') == '0' ? '' : 'd-none' }}" id="add_inactive_note_wrap">
+                            <label class="form-label fw-semibold">
+                                {{ __('app.Inactive Note') }} <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="inactive_note" id="add_inactive_note" class="form-control" rows="2"
+                                placeholder="{{ __('app.Explain why this student is inactive...') }}"
+                                {{ old('status', '1') == '0' ? 'required' : '' }}>{{ old('inactive_note') }}</textarea>
+                            @error('inactive_note')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
@@ -417,12 +463,32 @@
                                 <label class="form-label fw-semibold">
                                     {{ __('app.Status') }} <span class="text-danger">*</span>
                                 </label>
-                                <select name="status" class="form-select rounded-3 py-2" required>
-                                    <option value="1" {{ old('status', $s->status) == 1 ? 'selected' : '' }}>Active
+                                <select name="status" class="form-select rounded-3 py-2"
+                                    id="edit_status_{{ $s->student_id }}" required
+                                    onchange="toggleInactiveNote(this, 'edit_{{ $s->student_id }}')">
+                                    <option value="1" {{ old('status', $s->status) == 1 ? 'selected' : '' }}>
+                                        {{ __('app.active') }}
                                     </option>
                                     <option value="0" {{ old('status', $s->status) == 0 ? 'selected' : '' }}>
-                                        Inactive</option>
+                                        {{ __('app.inactive') }}</option>
                                 </select>
+                                @error('status')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12 {{ old('status', $s->status) == 0 ? '' : 'd-none' }}"
+                                id="edit_{{ $s->student_id }}_inactive_note_wrap">
+                                <label class="form-label fw-semibold">
+                                    {{ __('app.Inactive Note') }} <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="inactive_note" id="edit_{{ $s->student_id }}_inactive_note"
+                                    class="form-control" rows="2"
+                                    placeholder="{{ __('app.Explain why this student is inactive...') }}"
+                                    {{ old('status', $s->status) == 0 ? 'required' : '' }}>{{ old('inactive_note', $s->inactive_note) }}</textarea>
+                                @error('inactive_note')
+                                    <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                         </div>
@@ -491,6 +557,13 @@
                                     @endif
                                 </div>
                             </div>
+
+                            @if ($s->status == 0 && $s->inactive_note)
+                                <div class="col-12">
+                                    <label class="text-secondary small mb-1 d-block">{{ __('app.Inactive Note') }}</label>
+                                    <div class="fw-semibold">{{ $s->inactive_note }}</div>
+                                </div>
+                            @endif
 
                             <div class="col-12 col-md-6">
                                 <label class="text-secondary small mb-1 d-block">{{ __('app.created_at') }}</label>
@@ -587,6 +660,36 @@
                 dropdown.classList.add('d-none');
             }
         });
+
+        // ── Status filter dropdown ───────────────────────────────────────
+        function toggleStatusDropdown(e) {
+            e.stopPropagation();
+            document.getElementById('statusFilterDropdown').classList.toggle('d-none');
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('statusFilterDropdown');
+            const btn = document.getElementById('statusFilterBtn');
+            if (dropdown && !dropdown.contains(e.target) && e.target !== btn) {
+                dropdown.classList.add('d-none');
+            }
+        });
+
+        // ── Inactive note toggle (Add / Edit forms) ──────────────────────
+        function toggleInactiveNote(selectEl, prefix) {
+            const wrap = document.getElementById(prefix + '_inactive_note_wrap');
+            const textarea = document.getElementById(prefix + '_inactive_note');
+            if (!wrap || !textarea) return;
+
+            if (selectEl.value === '0') {
+                wrap.classList.remove('d-none');
+                textarea.setAttribute('required', 'required');
+            } else {
+                wrap.classList.add('d-none');
+                textarea.removeAttribute('required');
+                textarea.value = '';
+            }
+        }
 
         function toggleBorrowDropdown(e) {
             e.stopPropagation();

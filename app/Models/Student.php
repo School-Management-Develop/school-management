@@ -17,6 +17,7 @@ class Student extends Model
         'gender',
         'group_id',
         'status',
+        'inactive_note',
     ];
 
     // ---------------------------------------------------------------------------

@@ -317,4 +317,6 @@ return [
     'Restore Items' => 'ស្តារសម្ភារៈ',
     'Item restored successfully.' => 'បានស្តារសម្ភារៈដោយជោគជ័យ។',
     'Are you sure you want to restore the selected items?' => 'តើអ្នកប្រាកដថាចង់ស្ដារឡើងវិញសម្ភារៈដែលបានជ្រើសរើសទេ?',
+    'Inactive Note' => 'កំណត់ចំណាំមូលហេតុមិនសកម្ម',
+    'Explain why this student is inactive...' => 'សូមពន្យល់ពីមូលហេតុដែលសិស្សនេះមិនសកម្ម...',
 ];
