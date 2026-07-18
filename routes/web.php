@@ -5,6 +5,7 @@ use App\Http\Controllers\Backend\BorrowController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\GroupController;
 use App\Http\Controllers\Backend\ItemController;
+use App\Http\Controllers\Backend\StaffRankingController;
 use App\Http\Controllers\Backend\StudentController;
 use App\Http\Controllers\Backend\StudentRegisterController;
 use App\Http\Controllers\Backend\SubmissionController;
@@ -141,6 +142,13 @@ Route::middleware(['auth', 'role:admin,staff'])
         Route::get('/late-returns', [BorrowController::class, 'lateReturns'])->name('borrows.late_returns');
         Route::get('/overdue-borrows', [BorrowController::class, 'overdueBorrows'])->name('borrows.overdue');
         Route::get('/item-history', [BorrowController::class, 'itemHistory'])->name('borrows.history');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Staff Ranking
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/staff-ranking', [StaffRankingController::class, 'index'])->name('staff_ranking.index');
 
         /*
         |--------------------------------------------------------------------------

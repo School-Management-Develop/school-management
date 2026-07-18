@@ -381,6 +381,14 @@ $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
                         </li>
 
                         <li class="sidebar-menu-item">
+                            <a href="{{ route('staff_ranking.index') }}"
+                                class="sidebar-link {{ request()->routeIs('staff_ranking.index') ? 'active' : '' }}">
+                                <span class="sidebar-icon"><i class="bi bi-trophy"></i></span>
+                                <span class="sidebar-label">{{ __('app.staff_ranking') }}</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-menu-item">
                             <a href="{{ route('submissions.index') }}"
                                 class="sidebar-link {{ request()->routeIs('submissions.*') ? 'active' : '' }}">
                                 <span class="sidebar-icon"><i class="bi bi-inbox"></i></span>
@@ -495,6 +503,14 @@ $canManageUsers = in_array($role, ['admin', 'super admin', 'superadmin']);
                         class="sidebar-link {{ request()->routeIs('borrows.history') ? 'active' : '' }}">
                         <span class="sidebar-icon"><i class="bi bi-clock-history"></i></span>
                         <span class="sidebar-label">{{ __('app.manage_item_history') }}</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('staff_ranking.index') }}"
+                        class="sidebar-link {{ request()->routeIs('staff_ranking.index') ? 'active' : '' }}">
+                        <span class="sidebar-icon"><i class="bi bi-trophy"></i></span>
+                        <span class="sidebar-label">{{ __('app.staff_ranking') }}</span>
                     </a>
                 </li>
 

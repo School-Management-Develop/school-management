@@ -42,6 +42,7 @@ return [
     'admin_panel' => 'ផ្ទាំងគ្រប់គ្រងអ្នកគ្រប់គ្រង',
     'manage_items' => 'គ្រប់គ្រងសម្ភារៈ',
     'manage_item_history' => 'ប្រវត្តិខ្ចីសម្ភារៈ',
+    'staff_ranking' => 'ចំណាត់ថ្នាក់បុគ្គលិក',
     'register_student' => 'ចុះឈ្មោះសិស្ស',
     'users' => 'អ្នកប្រើប្រាស់',
     'returned_late' => 'ប្រគល់យឺត',

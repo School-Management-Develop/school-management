@@ -59,6 +59,7 @@ return [
     'admin_panel' => 'Admin Panel',
     'manage_items' => 'Manage Items',
     'manage_item_history' => 'Manage Item History',
+    'staff_ranking' => 'Staff Ranking',
     'register_student' => 'Register Student',
     'users' => 'Users',
     'returned_late' => 'Returned Late',
